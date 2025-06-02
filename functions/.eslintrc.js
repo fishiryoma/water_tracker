@@ -27,5 +27,8 @@ module.exports = {
     quotes: ['error', 'single', { avoidEscape: true, allowTemplateLiterals: true }],
     'import/no-unresolved': 0,
     indent: ['error', 2],
+    'no-console': 'off',
+    'no-unused-vars': 'warn',
+    'require-jsdoc': 'off',
   },
 }
