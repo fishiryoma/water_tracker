@@ -4,11 +4,11 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { onMounted, ref, onBeforeUnmount } from 'vue'
 
-const bgContainer = ref(null)
-let intervalId = null
+const bgContainer = ref<HTMLElement | null>(null)
+let intervalId: NodeJS.Timeout | null = null
 onMounted(() => {
   // upgrade: 增加花瓣類型, 飄動軌跡更自然
 
@@ -22,7 +22,7 @@ onMounted(() => {
       petal.style.left = Math.random() * window.innerWidth + 'px'
     }
     petal.style.animationDuration = 5 + Math.random() * 5 + 's'
-    petal.style.opacity = Math.random()
+    petal.style.opacity = Math.random().toString()
 
     if (bgContainer.value) {
       bgContainer.value.appendChild(petal)

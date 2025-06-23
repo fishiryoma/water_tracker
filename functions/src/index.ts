@@ -1,7 +1,7 @@
 import { onRequest } from 'firebase-functions/v2/https'
 import { initializeApp } from 'firebase-admin/app'
 import { getDatabase } from 'firebase-admin/database'
-import { WebhookEvent, Message, Client, validateSignature } from '@line/bot-sdk'
+import { WebhookEvent, Message, Client } from '@line/bot-sdk'
 import { defineString } from 'firebase-functions/params'
 import * as crypto from 'crypto'
 
@@ -165,7 +165,7 @@ export const lineWebhook = onRequest(
     // 簽名驗證
     try {
       const isValidSignature = debugValidateSignature(requestBody, signature, secretValue)
-      const useLineValid = validateSignature(requestBody, secretValue, signature)
+      // const useLineValid = validateSignature(requestBody, secretValue, signature)
       if (!isValidSignature) {
         console.warn('❌ 簽名驗證失敗')
         res.status(401).send('❌ Invalid signature')
@@ -271,7 +271,7 @@ export const lineWebhook = onRequest(
             ) {
               // 生成 LINE Login URL
               const channelId = lineChannelId.value()
-              const redirectUri = encodeURIComponent('https://your-domain.com/auth/callback') // 替換為您的網域
+              const redirectUri = encodeURIComponent('https://liff.line.me/2007574485-nVKgAdK9') // 替換為您的網域
               const state = crypto.randomBytes(16).toString('hex')
               const nonce = crypto.randomBytes(16).toString('hex')
 
@@ -388,7 +388,7 @@ export const lineAuthCallback = onRequest(
         body: new URLSearchParams({
           grant_type: 'authorization_code',
           code: code as string,
-          redirect_uri: 'https://your-domain.com/auth/callback', // 替換為您的網域
+          redirect_uri: 'https://water-record.firebaseapp.com/__/auth/handler', // 替換為您的網域
           client_id: lineChannelId.value(),
           client_secret: lineChannelSecret.value(),
         }),
