@@ -38,8 +38,8 @@ import { ref as dbRef, set, onValue } from 'firebase/database'
 import { useStore } from '@/hooks/useStore'
 import { storeToRefs } from 'pinia'
 
-const { userId } = storeToRefs(useStore())
-const testId = `${userId.value}/waterTarget`
+const { getUserPath } = storeToRefs(useStore())
+const testId = `${getUserPath.value}/waterTarget`
 
 const targetAmount = ref<number | null>(null)
 const currentTarget = ref<number>(0)
@@ -64,7 +64,7 @@ onMounted(() => {
         currentTarget.value = data
         targetAmount.value = data
       } else {
-        currentTarget.value = 0
+        currentTarget.value = 1000
       }
     },
     (error) => {

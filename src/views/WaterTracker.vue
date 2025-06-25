@@ -62,8 +62,7 @@ import { ref as dbRef, onValue, update } from 'firebase/database'
 import { useStore } from '@/hooks/useStore'
 import { storeToRefs } from 'pinia'
 
-const { userId } = storeToRefs(useStore())
-const testId = `${userId.value}`
+const { getUserPath } = storeToRefs(useStore())
 
 // 響應式數據
 const dailyTarget = ref<number>(0) // 每日喝水目標
@@ -99,7 +98,7 @@ onMounted(() => {
   todayDate.value = getTodayDate()
 
   // 1. 監聽每日喝水目標
-  const targetRef = dbRef(database, `${testId}/waterTarget`)
+  const targetRef = dbRef(database, `${getUserPath.value}/waterTarget`)
   onValue(
     targetRef,
     (snapshot) => {
@@ -116,7 +115,10 @@ onMounted(() => {
   )
 
   // 2. 監聽今日已喝水量
-  const todayDrankRef = dbRef(database, `${testId}/dailyRecords/${todayDate.value}/totalDrank`)
+  const todayDrankRef = dbRef(
+    database,
+    `${getUserPath.value}/dailyRecords/${todayDate.value}/totalDrank`,
+  )
   onValue(
     todayDrankRef,
     (snapshot) => {
@@ -136,7 +138,7 @@ onMounted(() => {
 // 增加喝水量
 const addWater = async (amount: number) => {
   const newTotalDrank = todayDrank.value + amount
-  const recordPath = `${testId}/dailyRecords/${todayDate.value}`
+  const recordPath = `${getUserPath.value}/dailyRecords/${todayDate.value}`
 
   try {
     await update(dbRef(database, recordPath), {

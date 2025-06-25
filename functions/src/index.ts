@@ -14,15 +14,6 @@ const channelSecret = defineString('LINE_SECRET', {
   description: 'LINE Bot Channel Secret',
 })
 
-// LINE Login 相關配置
-const lineChannelId = defineString('LINE_CHANNEL_ID', {
-  description: 'LINE Login Channel ID',
-})
-
-const lineChannelSecret = defineString('LINE_CHANNEL_SECRET', {
-  description: 'LINE Login Channel Secret',
-})
-
 // 初始化 Firebase Admin SDK
 initializeApp()
 
@@ -35,11 +26,7 @@ interface UserData {
   joinedAt: string
   lastActiveAt: string
   isActive: boolean
-  // LINE Login 相關資料
-  email?: string
-  lineLoginUserId?: string
-  accessToken?: string
-  refreshToken?: string
+  waterTarget: number
 }
 
 // 自定義簽名驗證函數
@@ -67,11 +54,9 @@ async function saveUserToDatabase(userData: UserData): Promise<void> {
     if (existingData) {
       // 更新現有用戶的最後活動時間
       await userRef.update({
+        ...userData,
         lastActiveAt: userData.lastActiveAt,
         isActive: true,
-        ...(userData.displayName && { displayName: userData.displayName }),
-        ...(userData.pictureUrl && { pictureUrl: userData.pictureUrl }),
-        ...(userData.statusMessage && { statusMessage: userData.statusMessage }),
       })
       console.log(`✅ 用戶 ${userData.lineUserId} 資料已更新`)
     } else {
@@ -120,12 +105,6 @@ export const lineWebhook = onRequest(
     try {
       tokenValue = channelAccessToken.value()
       secretValue = channelSecret.value()
-
-      if (!tokenValue || !secretValue) {
-        console.error('❌ LINE Bot secrets are missing!')
-        res.status(500).send('❌ Server configuration error')
-        return
-      }
     } catch (error) {
       console.error('❌ 環境變數讀取失敗:', error)
       res.status(500).send('❌ Server configuration error')
@@ -165,7 +144,6 @@ export const lineWebhook = onRequest(
     // 簽名驗證
     try {
       const isValidSignature = debugValidateSignature(requestBody, signature, secretValue)
-      // const useLineValid = validateSignature(requestBody, secretValue, signature)
       if (!isValidSignature) {
         console.warn('❌ 簽名驗證失敗')
         res.status(401).send('❌ Invalid signature')
@@ -209,6 +187,7 @@ export const lineWebhook = onRequest(
               joinedAt: new Date().toISOString(),
               lastActiveAt: new Date().toISOString(),
               isActive: true,
+              waterTarget: 1000,
             }
 
             // 儲存到數據庫
@@ -217,10 +196,10 @@ export const lineWebhook = onRequest(
             // 發送歡迎訊息
             const welcomeMessage: Message = {
               type: 'text',
-              text: `🎉 歡迎加入！${profile?.displayName || '朋友'}\n\n我是您的專屬助手，每天都會為您提供個人化的服務。\n\n如果您想要更完整的體驗，歡迎使用 LINE 登入功能來連結您的帳戶！`,
+              text: `🎉 歡迎加入！${profile?.displayName || '朋友'}\n\n多喝水沒事沒事多喝水\n\n 趕快連結您的 LINE 帳戶！\n\nhttps://water-record.web.app/`,
             }
 
-            if (event.replyToken && event.replyToken !== '00000000000000000000000000000000') {
+            if (event.replyToken) {
               const lineClient = new Client({
                 channelAccessToken: tokenValue,
                 channelSecret: secretValue,
@@ -266,44 +245,23 @@ export const lineWebhook = onRequest(
 
             // 檢查是否為 LINE Login 相關指令
             if (
-              userMessage.toLowerCase().includes('登入') ||
-              userMessage.toLowerCase().includes('login')
+              userMessage.includes('登入') ||
+              userMessage.toLowerCase().includes('login') ||
+              userMessage.includes('ログイン')
             ) {
-              // 生成 LINE Login URL
-              const channelId = lineChannelId.value()
-              const redirectUri = encodeURIComponent('https://liff.line.me/2007574485-nVKgAdK9') // 替換為您的網域
-              const state = crypto.randomBytes(16).toString('hex')
-              const nonce = crypto.randomBytes(16).toString('hex')
-
-              // 儲存 state 和 nonce 到數據庫以供驗證
-              await db.ref(`auth_states/${state}`).set({
-                lineUserId: userId,
-                nonce: nonce,
-                createdAt: new Date().toISOString(),
-              })
-
-              const loginUrl =
-                `https://access.line.me/oauth2/v2.1/authorize?` +
-                `response_type=code&` +
-                `client_id=${channelId}&` +
-                `redirect_uri=${redirectUri}&` +
-                `state=${state}&` +
-                `scope=profile%20openid%20email&` +
-                `nonce=${nonce}`
-
               replyMessage = {
                 type: 'text',
-                text: `🔐 LINE 登入\n\n請點擊以下連結來連結您的 LINE 帳戶：\n${loginUrl}\n\n完成登入後，您就能享受完整的個人化服務！`,
+                text: `🔐 LINE 登入\n\n請點擊以下連結來連結您的 LINE 帳戶：\nhttps://water-record.web.app/`,
               }
             } else {
               // 一般回覆
               replyMessage = {
                 type: 'text',
-                text: `收到您的訊息：「${userMessage}」\n\n💡 小提示：輸入「登入」可以連結您的 LINE 帳戶，獲得更好的服務體驗！`,
+                text: `收到您的訊息：「${userMessage}」\n\n💡 小提示：輸入「登入」可以連結您的 LINE 帳戶，趕快加入唷ASAP！`,
               }
             }
 
-            if (event.replyToken && event.replyToken !== '00000000000000000000000000000000') {
+            if (event.replyToken) {
               const lineClient = new Client({
                 channelAccessToken: tokenValue,
                 channelSecret: secretValue,
@@ -332,133 +290,5 @@ export const lineWebhook = onRequest(
     console.log(`事件處理完成: 成功 ${successful}, 失敗 ${failed}`)
     console.log('=== LINE Webhook 處理完成 ===')
     res.status(200).send('OK')
-  },
-)
-
-// --- LINE Login 回調處理 ---
-export const lineAuthCallback = onRequest(
-  {
-    region: 'asia-east1',
-    memory: '256MiB',
-    timeoutSeconds: 60,
-    invoker: 'public',
-  },
-  async (req, res): Promise<void> => {
-    console.log('=== LINE Login 回調處理 ===')
-
-    const { code, state, error } = req.query
-
-    if (error) {
-      console.error('❌ LINE Login 錯誤:', error)
-      res.status(400).send('❌ 登入失敗')
-      return
-    }
-
-    if (!code || !state) {
-      console.error('❌ 缺少必要參數')
-      res.status(400).send('❌ 缺少必要參數')
-      return
-    }
-
-    try {
-      const db = getDatabase()
-
-      // 驗證 state
-      const authStateRef = db.ref(`auth_states/${state}`)
-      const authStateSnapshot = await authStateRef.once('value')
-      const authState = authStateSnapshot.val()
-
-      if (!authState) {
-        console.error('❌ 無效的 state')
-        res.status(400).send('❌ 無效的登入請求')
-        return
-      }
-
-      const { lineUserId } = authState
-
-      // 清除 state（一次性使用）
-      await authStateRef.remove()
-
-      // 交換 access token
-      const tokenResponse = await fetch('https://api.line.me/oauth2/v2.1/token', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
-          grant_type: 'authorization_code',
-          code: code as string,
-          redirect_uri: 'https://water-record.firebaseapp.com/__/auth/handler', // 替換為您的網域
-          client_id: lineChannelId.value(),
-          client_secret: lineChannelSecret.value(),
-        }),
-      })
-
-      const tokenData = await tokenResponse.json()
-
-      if (!tokenResponse.ok) {
-        console.error('❌ Token 交換失敗:', tokenData)
-        res.status(400).send('❌ Token 交換失敗')
-        return
-      }
-
-      // 獲取用戶資料
-      const profileResponse = await fetch('https://api.line.me/v2/profile', {
-        headers: {
-          Authorization: `Bearer ${tokenData.access_token}`,
-        },
-      })
-
-      const profileData = await profileResponse.json()
-
-      if (!profileResponse.ok) {
-        console.error('❌ 獲取用戶資料失敗:', profileData)
-        res.status(400).send('❌ 獲取用戶資料失敗')
-        return
-      }
-
-      // 更新數據庫中的用戶資料
-      const userRef = db.ref(`users/${lineUserId}`)
-      await userRef.update({
-        email: profileData.email,
-        lineLoginUserId: profileData.userId,
-        accessToken: tokenData.access_token,
-        refreshToken: tokenData.refresh_token,
-        lastActiveAt: new Date().toISOString(),
-      })
-
-      console.log(`✅ 用戶 ${lineUserId} LINE Login 成功`)
-
-      // 發送成功通知
-      const successMessage: Message = {
-        type: 'text',
-        text: `🎉 LINE 登入成功！\n\n您的帳戶已成功連結，現在可以享受完整的個人化服務了！`,
-      }
-
-      const lineClient = new Client({
-        channelAccessToken: channelAccessToken.value(),
-        channelSecret: channelSecret.value(),
-      })
-
-      await lineClient.pushMessage(lineUserId, successMessage)
-
-      res.status(200).send(`
-        <html>
-          <head><title>登入成功</title></head>
-          <body>
-            <h1>🎉 登入成功！</h1>
-            <p>您的 LINE 帳戶已成功連結，請回到聊天室查看確認訊息。</p>
-            <script>
-              setTimeout(() => {
-                window.close();
-              }, 3000);
-            </script>
-          </body>
-        </html>
-      `)
-    } catch (error) {
-      console.error('❌ LINE Login 回調處理失敗:', error)
-      res.status(500).send('❌ 服務器錯誤')
-    }
   },
 )

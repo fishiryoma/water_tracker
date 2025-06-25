@@ -4,19 +4,28 @@ import Petal from '@/views/Background.vue'
 import Container from '@/views/Container.vue'
 import liff from '@line/liff'
 
-async function initializeLiff() {
+import { useRouter } from 'vue-router'
+import { useStore } from '@/hooks/useStore'
+import { storeToRefs } from 'pinia'
+import { auth } from '@/firebase' // 導入 Firebase Auth 實例
+import { signOut } from 'firebase/auth' // <-- 這裡新增導入 signOut
+
+const router = useRouter()
+const { setUserId } = useStore()
+const { userId } = storeToRefs(useStore())
+
+const handleLogout = async (): Promise<void> => {
   try {
-    await liff.init({ liffId: '2007574485-nVKgAdK9' }) // **替換成你的 LIFF ID**
-    console.log('LIFF init success')
-    // 如果需要，可以在這裡檢查 LIFF 是否登入
-    // if (!liff.isLoggedIn()) {
-    //   liff.login(); // 強制登入
-    // }
-  } catch (error) {
-    console.error('LIFF init failed', error)
+    await signOut(auth)
+    setUserId('')
+    if (liff.isLoggedIn()) {
+      liff.logout() // 呼叫 LIFF 的登出方法
+    }
+    router.push('/')
+  } catch (error: any) {
+    console.error('登出失敗:', error)
   }
 }
-initializeLiff()
 </script>
 
 <template>
@@ -28,24 +37,24 @@ initializeLiff()
     <Container>
       <RouterView />
     </Container>
-    <!-- 決定Button要以誰為基準點render -->
-    <!-- <div class="relative"> -->
-    <div
-      class="flex flex-col items-center justify-center bg-green-600 text-white rounded-full px-4 py-2 absolute bottom-4 right-1/2 transform translate-x-[180px] sm:translate-x-[200px] hover:opacity-80 cursor-pointer duration-200"
-    >
-      <div>L</div>
+    <div class="relative" v-if="userId.length > 0">
+      <div
+        @click="handleLogout"
+        class="flex flex-col items-center justify-center bg-green-600 text-white rounded-full px-4 py-2 absolute -bottom-12 right-1/2 transform translate-x-[180px] sm:translate-x-[200px] hover:opacity-80 cursor-pointer duration-200"
+      >
+        <img class="w-7 stroke-orange-50" src="@/assets/door.svg" />
+      </div>
+      <div
+        class="absolute -bottom-12 left-1/2 transform -translate-x-[170px] sm:-translate-x-[200px] cursor-pointer"
+      >
+        <RouterLink to="/target"><img src="@/assets/target.svg" class="w-14" /></RouterLink>
+      </div>
+      <div
+        class="absolute -bottom-12 left-1/2 transform -translate-x-[90px] sm:-translate-x-[120px] cursor-pointer"
+      >
+        <RouterLink to="/tracker"><img src="@/assets/drink.svg" class="w-14" /></RouterLink>
+      </div>
     </div>
-    <div
-      class="absolute bottom-4 left-1/2 transform -translate-x-[180px] sm:-translate-x-[200px] cursor-pointer"
-    >
-      <RouterLink to="/target"><img src="@/assets/target.svg" class="w-14" /></RouterLink>
-    </div>
-    <div
-      class="absolute bottom-4 left-1/2 transform -translate-x-[150px] sm:-translate-x-[120px] cursor-pointer"
-    >
-      <RouterLink to="/tracker"><img src="@/assets/drink.svg" class="w-14" /></RouterLink>
-    </div>
-    <!-- </div> -->
   </Petal>
 </template>
 

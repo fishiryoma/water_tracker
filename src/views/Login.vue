@@ -1,6 +1,5 @@
 <template>
   <div class="">
-    <!-- Logo & 標題 -->
     <div
       class="w-20 h-20 bg-gradient-to-br from-green-600 to-green-400 rounded-full flex items-center justify-center text-white text-xl font-bold mx-auto mb-4"
     >
@@ -8,26 +7,18 @@
     </div>
     <h1 class="text-2xl md:text-3xl font-semibold mb-4 text-gray-800">多喝水沒事沒事多喝水</h1>
 
-    <!-- 載入中 -->
-    <div v-if="loading" class="mb-4">
+    <div v-if="loading" class="mu-6">
       <div
         class="animate-spin border-4 border-gray-200 border-t-4 border-t-green-500 rounded-full w-8 h-8 mx-auto mb-2"
       ></div>
-      <p class="text-gray-600">載入中...</p>
+      <p class="text-gray-600">載入中</p>
     </div>
 
-    <!-- 錯誤訊息 -->
     <div v-if="loginError" class="mb-4 bg-red-100 text-red-700 p-4 rounded-lg">
       {{ loginError }}
     </div>
 
-    <!-- 成功訊息 -->
-    <div v-if="success" class="mb-4 bg-green-100 text-green-700 p-4 rounded-lg">
-      {{ success }}
-    </div>
-
-    <!-- 未登入 -->
-    <div v-if="!user && !loading">
+    <div v-if="!currentUser && !loading">
       <p class="text-gray-700 mb-4">請先連結 LINE 帳戶才能享受通知服務</p>
 
       <div class="space-y-4 mb-6 text-left">
@@ -55,7 +46,7 @@
         </div>
       </div>
       <button
-        class="login-btn bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-full transition transform hover:-translate-y-1"
+        class="login-btn bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-full transition transform hover:-translate-y-1 cursor-pointer"
         @click="handleLineLogin"
         :disabled="loading"
       >
@@ -67,115 +58,131 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { auth } from '@/firebase' // 導入 Firebase Auth 實例
-import { OAuthProvider, signInWithCredential } from 'firebase/auth' // 導入必要的 Firebase 方法
-import type { User } from 'firebase/auth' // 導入必要的 Firebase 方法
+import { useRouter } from 'vue-router'
 
-import liff from '@line/liff' // 導入 LIFF
+import { auth } from '@/firebase'
+import { OAuthProvider, signInWithCredential } from 'firebase/auth'
+import type { User } from 'firebase/auth'
+import { updateUserData } from '@/hooks/useUpdateUser'
 
-const currentUser = ref<User | null>(null) // 使用 Firebase User 類型
+import liff from '@line/liff'
+
+const currentUser = ref<User | null>(null)
 const loginError = ref<string | null>(null)
-const FIREBASE_LINE_PROVIDER_ID = 'oidc.line'
+const loading = ref(true)
+const router = useRouter()
 
-const user = ref(null)
-const loading = ref(false)
-
-const success = ref('')
-
-/**
- * 使用 LINE ID Token 登入 Firebase Authentication。
- * @param {string} lineIdToken - 從 LINE 獲取的使用者 ID Token。
- * @returns {Promise<void>}
- */
-const firebaseAuthWithLine = async (lineIdToken: string): Promise<void> => {
-  loginError.value = null // 清除之前的錯誤
-
+// 初始化 LIFF
+let liffReady = false
+async function initializeLiff() {
   try {
-    const provider = new OAuthProvider(FIREBASE_LINE_PROVIDER_ID)
-    // 將 LINE ID Token 作為自訂參數傳遞給 Firebase
-    provider.setCustomParameters({
-      id_token: lineIdToken,
-    })
+    await liff.init({ liffId: '2007574485-nVKgAdK9' })
+    liffReady = true
+    console.log('LIFF 初始化成功')
+    if (liff.isInClient()) {
+      console.log('在 LIFF 客戶端中')
+      // 使用 liff.openWindow() 在外部瀏覽器中開啟連結
+      liff.openWindow({
+        url: 'https://water-record.web.app/',
+        external: true,
+      })
+    }
+  } catch (error) {
+    console.error('LIFF 初始化失敗', error)
+  }
+}
 
-    // 使用 ID Token 建立 Firebase 憑證並登入
-    const credential = provider.credential({ idToken: lineIdToken })
+// 使用 LINE ID Token 登入 Firebase
+const loginWithLineToken = async (idToken: string) => {
+  try {
+    const provider = new OAuthProvider('oidc.line')
+    provider.setCustomParameters({ id_token: idToken })
+
+    const credential = provider.credential({ idToken })
     const result = await signInWithCredential(auth, credential)
 
-    currentUser.value = result.user
-    console.log('Firebase 登入成功！使用者 UID:', currentUser.value.uid)
-  } catch (error: any) {
-    console.error('Firebase 登入失敗：', error)
-    loginError.value = `Firebase 登入失敗: ${error.message}`
-
-    if (error.code === 'auth/account-exists-with-different-credential') {
-      // 處理多個登入方式連結到同一帳號的情況
-      loginError.value += ' - 此郵箱已被其他登入方式使用。'
-      // 這裡你可以提示用戶先用已有的方式登入，然後再進行帳號連結
-    }
+    console.log('Firebase 登入成功')
+    return result.user
+  } catch (error) {
+    console.error('Firebase 登入失敗:', error)
+    throw error
   }
 }
 
-/**
- * 處理 LINE 登入流程。
- * @returns {Promise<void>}
- */
-const handleLineLogin = async (): Promise<void> => {
-  loginError.value = null // 清除之前的錯誤
+// 處理 LINE 登入
+const handleLineLogin = async () => {
+  loading.value = true
+  loginError.value = null
 
   try {
-    if (!liff.isLoggedIn()) {
-      // 如果未登入 LIFF，則導向 LINE 登入頁面
-      console.log('Not logged in to LIFF, redirecting for login...')
-      liff.login({
-        redirectUri: window.location.href, // 登入成功後導回當前頁面
-      })
-    } else {
-      // 如果已登入 LIFF
+    // 等待 LIFF 初始化
+    if (!liffReady) {
+      await initializeLiff()
+    }
+
+    // 等待一下確保 LIFF 完全初始化
+    await new Promise((resolve) => setTimeout(resolve, 500))
+
+    if (liff.isLoggedIn()) {
       const idToken = liff.getIDToken()
       if (idToken) {
-        console.log('Already logged in to LIFF. ID Token:', idToken)
-        await firebaseAuthWithLine(idToken)
+        console.log('使用現有 ID Token 登入')
+        const user = await loginWithLineToken(idToken)
+        await updateUserData(user)
+        router.push('/tracker')
       } else {
-        // 如果已登入但沒有 ID Token (可能因為 scope 不足或 token 過期)，則重新登入
-        console.warn('LIFF logged in but no ID Token. Attempting re-login with correct scope.')
-        liff.login({
-          redirectUri: window.location.href,
-        })
+        console.log('無 ID Token，重新登入')
+        liff.login({ redirectUri: window.location.href })
       }
+    } else {
+      console.log('LIFF 未登入，導向登入頁')
+      liff.login({ redirectUri: window.location.href })
     }
   } catch (error: any) {
-    console.error('Error during LINE login process:', error)
-    loginError.value = `LINE 登入啟動失敗: ${error.message}`
+    console.error('登入失敗:', error)
+    loginError.value = '登入失敗，請重試'
   }
 }
 
-// 組件掛載時執行
-onMounted(async () => {
-  // 監聽 Firebase 登入狀態變化
-  auth.onAuthStateChanged((firebaseUser) => {
-    currentUser.value = firebaseUser
-    if (firebaseUser) {
-      console.log('Firebase user is logged in:', firebaseUser.uid)
-    } else {
-      console.log('No Firebase user logged in.')
-    }
-  })
+// 檢查登入狀態
+const checkLoginStatus = async () => {
+  // 先檢查 Firebase 是否已登入
+  if (auth.currentUser) {
+    console.log('Firebase 已登入')
+    currentUser.value = auth.currentUser
+    await updateUserData(auth.currentUser)
+    router.push('/tracker')
+    return
+  }
 
-  // 如果 LIFF 已經初始化且使用者已經登入，嘗試直接登入 Firebase
-  // 這處理了用戶從 LINE 授權頁面跳轉回來的情況
+  // 等待 LIFF 初始化
+  if (!liffReady) {
+    await initializeLiff()
+  }
+
+  // 等待一下確保 LIFF 完全初始化
+  await new Promise((resolve) => setTimeout(resolve, 1000))
+
   if (liff.isLoggedIn()) {
-    try {
-      const idToken = liff.getIDToken()
-      if (idToken) {
-        console.log('LIFF is initialized and logged in, attempting Firebase login...')
-        await firebaseAuthWithLine(idToken)
-      } else {
-        console.warn('LIFF logged in but no ID Token available after redirect. Check scopes.')
+    const idToken = liff.getIDToken()
+    if (idToken) {
+      console.log('LIFF 已登入，使用 ID Token 登入 Firebase')
+      try {
+        const user = await loginWithLineToken(idToken)
+        await updateUserData(user)
+        router.push('/tracker')
+      } catch (error) {
+        console.error('自動登入失敗:', error)
+        loginError.value = '自動登入失敗，請重新登入'
       }
-    } catch (e: any) {
-      console.error('Error processing LIFF callback:', e)
-      loginError.value = `處理 LIFF 回呼失敗: ${e.message}`
     }
   }
+
+  loading.value = false
+}
+
+onMounted(() => {
+  console.log('組件掛載')
+  checkLoginStatus()
 })
 </script>
