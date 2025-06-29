@@ -1,11 +1,11 @@
 // 更新用戶資料
 import { database } from '@/firebase'
 import { ref as dbRef, update } from 'firebase/database'
-import { useStore } from '@/hooks/useStore'
+import { useUserIdStore } from '@/stores/userId'
 import type { User } from 'firebase/auth'
 
 export const updateUserData = async (user: User) => {
-  const { setUserId } = useStore()
+  const { setUserId } = useUserIdStore()
   const userId = user.providerData[0]?.uid
   if (userId) {
     setUserId(userId)

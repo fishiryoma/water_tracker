@@ -35,10 +35,10 @@
 import { ref, onMounted, computed } from 'vue'
 import { database } from '@/firebase'
 import { ref as dbRef, set, onValue } from 'firebase/database'
-import { useStore } from '@/hooks/useStore'
+import { useUserIdStore } from '@/stores/userId'
 import { storeToRefs } from 'pinia'
 
-const { getUserPath } = storeToRefs(useStore())
+const { getUserPath } = storeToRefs(useUserIdStore())
 const testId = `${getUserPath.value}/waterTarget`
 
 const targetAmount = ref<number | null>(null)

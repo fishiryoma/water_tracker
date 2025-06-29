@@ -59,10 +59,10 @@
 import { ref, onMounted, computed } from 'vue'
 import { database } from '@/firebase'
 import { ref as dbRef, onValue, update } from 'firebase/database'
-import { useStore } from '@/hooks/useStore'
+import { useUserIdStore } from '@/stores/userId'
 import { storeToRefs } from 'pinia'
 
-const { getUserPath } = storeToRefs(useStore())
+const { getUserPath } = storeToRefs(useUserIdStore())
 
 // 響應式數據
 const dailyTarget = ref<number>(0) // 每日喝水目標

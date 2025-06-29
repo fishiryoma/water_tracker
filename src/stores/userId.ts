@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 
-export const useStore = defineStore('userId', () => {
+export const useUserIdStore = defineStore('userId', () => {
   const userId = ref('')
   function setUserId(newId: string) {
     userId.value = newId
