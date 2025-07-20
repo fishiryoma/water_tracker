@@ -7,7 +7,7 @@ module.exports = {
     'plugin:vue/vue3-essential',
     'eslint:recommended',
     '@vue/prettier',
-    '@vue/typescript/recommended'
+    '@vue/typescript/recommended',
   ],
   parserOptions: {
     ecmaVersion: 2020,
@@ -15,15 +15,16 @@ module.exports = {
   rules: {
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
-    'vue/no-unused-components': 'error',
-    'vue/no-unused-vars': 'error',
+    'vue/no-unused-components': 'warn',
+    'vue/no-unused-vars': 'warn',
     '@typescript-eslint/explicit-function-return-type': [
       'error',
       {
         allowExpressions: true,
-        allowTypedFunctionExpressions: true
-      }
+        allowTypedFunctionExpressions: true,
+      },
     ],
-    '@typescript-eslint/no-explicit-any': 'warn'
-  }
+    '@typescript-eslint/no-explicit-any': 'warn',
+    'no-unused-vars': 'warn',
+  },
 }

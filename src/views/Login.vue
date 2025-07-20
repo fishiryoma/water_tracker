@@ -7,7 +7,7 @@
     </div>
     <h1 class="text-2xl md:text-3xl font-semibold mb-4 text-gray-800">多喝水沒事沒事多喝水</h1>
 
-    <div v-if="loading" class="mu-6">
+    <div v-if="loading" class="my-6">
       <div
         class="animate-spin border-4 border-gray-200 border-t-4 border-t-green-500 rounded-full w-8 h-8 mx-auto mb-2"
       ></div>
@@ -31,17 +31,6 @@
           <div>
             <strong class="block">每日喝水提醒</strong>
             <small class="text-gray-600">根據您的偏好發送客製化內容</small>
-          </div>
-        </div>
-        <div class="flex items-start bg-gray-100 p-4 rounded-lg">
-          <div
-            class="text-white bg-gray-200 rounded-full w-8 h-8 flex items-center justify-center mr-3"
-          >
-            📱
-          </div>
-          <div>
-            <strong class="block">多喝水維持身體健康</strong>
-            <small class="text-gray-600">輕鬆代謝不求人</small>
           </div>
         </div>
       </div>
@@ -69,7 +58,7 @@ import liff from '@line/liff'
 
 const currentUser = ref<User | null>(null)
 const loginError = ref<string | null>(null)
-const loading = ref(true)
+const loading = ref(false)
 const router = useRouter()
 
 // 初始化 LIFF
@@ -120,9 +109,6 @@ const handleLineLogin = async () => {
       await initializeLiff()
     }
 
-    // 等待一下確保 LIFF 完全初始化
-    await new Promise((resolve) => setTimeout(resolve, 500))
-
     if (liff.isLoggedIn()) {
       const idToken = liff.getIDToken()
       if (idToken) {
@@ -146,39 +132,48 @@ const handleLineLogin = async () => {
 
 // 檢查登入狀態
 const checkLoginStatus = async () => {
+  loading.value = true
+  loginError.value = null
+
   // 先檢查 Firebase 是否已登入
-  if (auth.currentUser) {
-    console.log('Firebase 已登入')
-    currentUser.value = auth.currentUser
-    await updateUserData(auth.currentUser)
-    router.push('/tracker')
-    return
-  }
-
-  // 等待 LIFF 初始化
-  if (!liffReady) {
-    await initializeLiff()
-  }
-
-  // 等待一下確保 LIFF 完全初始化
-  await new Promise((resolve) => setTimeout(resolve, 1000))
-
-  if (liff.isLoggedIn()) {
-    const idToken = liff.getIDToken()
-    if (idToken) {
-      console.log('LIFF 已登入，使用 ID Token 登入 Firebase')
+  try {
+    if (auth.currentUser) {
+      console.log('Firebase 已登入')
+      currentUser.value = auth.currentUser
       try {
-        const user = await loginWithLineToken(idToken)
-        await updateUserData(user)
+        await updateUserData(auth.currentUser)
         router.push('/tracker')
       } catch (error) {
-        console.error('自動登入失敗:', error)
-        loginError.value = '自動登入失敗，請重新登入'
+        console.error('更新使用者資料失敗:', error)
+        loginError.value = '更新使用者資料失敗，請重新登入'
+      }
+      return
+    }
+
+    // 等待 LIFF 初始化
+    if (!liffReady) {
+      await initializeLiff()
+    }
+
+    if (liff.isLoggedIn()) {
+      const idToken = liff.getIDToken()
+      if (idToken) {
+        console.log('LIFF 已登入，使用 ID Token 登入 Firebase')
+        try {
+          const user = await loginWithLineToken(idToken)
+          await updateUserData(user)
+          router.push('/tracker')
+        } catch (error) {
+          console.error('自動登入失敗:', error)
+          loginError.value = '自動登入失敗，請重新登入'
+        }
       }
     }
+  } catch (error) {
+    console.error('檢查登入狀態失敗:', error)
+  } finally {
+    loading.value = false
   }
-
-  loading.value = false
 }
 
 onMounted(() => {

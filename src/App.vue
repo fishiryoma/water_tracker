@@ -74,26 +74,23 @@ onUnmounted(() => {
     <Container>
       <RouterView />
     </Container>
-    <div class="relative" v-if="userId.length > 0">
-      <div
-        @click="handleLogout"
-        class="flex flex-col items-center justify-center bg-green-600 text-white rounded-full px-4 py-2 absolute -bottom-12 right-1/2 transform translate-x-[180px] sm:translate-x-[200px] hover:opacity-80 cursor-pointer duration-200"
-      >
-        <img class="w-7 stroke-orange-50" src="@/assets/door.svg" />
-      </div>
-      <div
-        class="absolute -bottom-12 left-1/2 transform -translate-x-[170px] sm:-translate-x-[200px] cursor-pointer"
-      >
+    <div class="flex justify-between mt-4 max-w-[500px] mx-auto" v-if="userId.length > 0">
+    <!-- <div class="flex justify-between mt-4 max-w-[500px] mx-auto"> -->
+      <div class="flex gap-4">
         <RouterLink to="/target">
           <img src="@/assets/target.svg" class="w-14" />
         </RouterLink>
-      </div>
-      <div
-        class="absolute -bottom-12 left-1/2 transform -translate-x-[90px] sm:-translate-x-[120px] cursor-pointer"
-      >
         <RouterLink to="/tracker">
           <img src="@/assets/drink.svg" class="w-14" />
         </RouterLink>
+      </div>
+      <div>
+        <div
+        @click="handleLogout"
+        class="flex flex-col items-center justify-center bg-green-600 text-white rounded-full px-4 py-2 hover:opacity-80 cursor-pointer duration-200"
+      >
+        <img class="w-7 stroke-orange-50" src="@/assets/door.svg" />
+      </div>
       </div>
     </div>
   </BackgroundContainer>
