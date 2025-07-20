@@ -1,7 +1,7 @@
 <template>
   <h1 class="text-3xl font-bold text-gray-800">已設定的目標</h1>
   <p>
-    <span class="font-semibold text-pink-700 text-3xl">{{ currentTarget }}</span> ml
+    <span class="font-semibold text-primary-700 text-3xl">{{ currentTarget }}</span> ml
   </p>
   <div class="w-full">
     <input
@@ -18,12 +18,12 @@
   <div class="flex gap-3">
     <button
       @click="saveTarget"
-      class="bg-pink-600/40 hover:bg-pink-600 text-white font-bold py-3 px-6 rounded-xl focus:outline-none focus:shadow-outline transition duration-300 ease-in-out text-lg"
+      class="bg-primary-600/40 hover:bg-primary-600 text-white font-bold py-3 px-6 rounded-xl focus:outline-none focus:shadow-outline transition duration-300 ease-in-out text-lg"
     >
       儲存目標
     </button>
     <button
-      class="text-pink-200 font-bold py-3 px-6 text-lg hover:text-black transition duration-300"
+      class="text-primary-200 font-bold py-3 px-6 text-lg hover:text-black transition duration-300"
     >
       <RouterLink to="/tracker">返回</RouterLink>
     </button>

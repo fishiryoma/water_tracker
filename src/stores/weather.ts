@@ -16,6 +16,8 @@ export const useWeatherStore = defineStore('weather', () => {
     longitude: null,
     lastFetchTime: null,
     weathercode: null,
+    // 0, 1晴朗 --> sakura
+    // 2, 3多雲 --> rain
   })
 
   const fetchWeather = async () => {

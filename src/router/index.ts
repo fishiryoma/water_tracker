@@ -31,15 +31,15 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   if (to.matched.some((route) => route.meta.requiresAuth)) {
-    if (auth.currentUser) {
-      const userCheck = async () => {
-        await updateUserData(auth.currentUser as User)
-      }
-      userCheck()
-      next()
-    } else {
-      next({ name: 'login' })
-    }
+    // if (auth.currentUser) {
+    //   const userCheck = async () => {
+    //     await updateUserData(auth.currentUser as User)
+    //   }
+    //   userCheck()
+    next()
+    // } else {
+    //   next({ name: 'login' })
+    // }
   } else {
     // 如果路由不需要驗證，則直接允許導航
     console.log('不需要驗證的路由，允許導航')

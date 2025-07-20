@@ -2,11 +2,13 @@
   <h1 class="text-3xl font-bold text-gray-800">今日喝水紀錄</h1>
   <div>
     <div v-if="remainingWater > 0" class="text-3xl font-bold text-gray-700">
-      {{ dailyTarget }} - {{ todayDrank }} = <span class="text-pink-500">{{ remainingWater }}</span>
+      {{ dailyTarget }} - {{ todayDrank }} =
+      <span class="text-primary-500">{{ remainingWater }}</span>
     </div>
     <div class="text-lg text-gray-800 mt-2">
       <p v-if="remainingWater > 0">
-        還差 <span class="text-2xl font-bold text-pink-500">{{ remainingWater }}</span> ml 達到目標
+        還差 <span class="text-2xl font-bold text-primary-500">{{ remainingWater }}</span> ml
+        達到目標
       </p>
       <p v-else class="text-green-700">恭喜！您已達成今日目標！</p>
     </div>
@@ -26,7 +28,7 @@
       v-for="amount in waterOptions"
       :key="amount"
       @click="addWater(amount)"
-      class="bg-pink-700/30 hover:bg-pink-700/80 text-white font-bold py-3 px-4 rounded-xl focus:outline-none focus:shadow-outline transition duration-300 ease-in-out text-lg"
+      class="bg-primary-700/30 hover:bg-primary-700/80 text-white font-bold py-3 px-4 rounded-xl focus:outline-none focus:shadow-outline transition duration-300 ease-in-out text-lg"
     >
       +{{ amount }}
     </button>
@@ -46,7 +48,7 @@
     />
     <button
       @click="(addWater(inputDrank), (inputDrank = 0))"
-      class="bg-pink-700/30 hover:bg-pink-700/80 text-white font-bold py-3 px-4 w-24 rounded-xl focus:outline-none focus:shadow-outline transition duration-300 ease-in-out text-lg"
+      class="bg-primary-700/30 hover:bg-primary-700/80 text-white font-bold py-3 px-4 w-24 rounded-xl focus:outline-none focus:shadow-outline transition duration-300 ease-in-out text-lg"
     >
       送出
     </button>

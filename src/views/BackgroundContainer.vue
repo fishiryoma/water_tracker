@@ -1,5 +1,5 @@
 <template>
-  <div ref="bgContainer" class="relative bg-pink-200/50 overflow-hidden h-screen">
+  <div ref="bgContainer" class="relative bg-primary-200/50 overflow-hidden h-screen">
     <slot></slot>
   </div>
 </template>
@@ -14,7 +14,7 @@ onMounted(() => {
 
   function createPetal() {
     const petal = document.createElement('div')
-    petal.classList.add('sakura')
+    petal.classList.add('rain')
 
     if (bgContainer.value) {
       petal.style.left = Math.random() * bgContainer.value.offsetWidth + 'px'
@@ -59,6 +59,19 @@ onBeforeUnmount(() => {
   z-index: 0;
 }
 
+.rain {
+  position: absolute;
+  top: -50px;
+  width: 60px;
+  height: 60px;
+  background-image: url('../assets/raindrop2.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  pointer-events: none;
+  animation: rainfall linear infinite;
+  z-index: 0;
+}
+
 @keyframes fall {
   0% {
     transform: translateY(0) rotate(0deg);
@@ -66,6 +79,17 @@ onBeforeUnmount(() => {
   }
   100% {
     transform: translateY(100vh) rotate(360deg);
+    opacity: 0.2;
+  }
+}
+
+@keyframes rainfall {
+  0% {
+    transform: translateY(0) rotate(15deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(0deg);
     opacity: 0.2;
   }
 }

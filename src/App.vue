@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
-import { onMounted, onUnmounted } from 'vue'
+import { onMounted, onUnmounted, watch } from 'vue'
 import BackgroundContainer from '@/views/BackgroundContainer.vue'
 import Container from '@/views/Container.vue'
 import liff from '@line/liff'
@@ -12,20 +12,22 @@ import { useWeatherStore } from '@/stores/weather'
 import { auth } from '@/firebase' // 導入 Firebase Auth 實例
 import { signOut } from 'firebase/auth' // <-- 這裡新增導入 signOut
 
+import { useTheme } from '@/hooks/useTheme'
+
 const router = useRouter()
 const { setUserId } = useUserIdStore()
 const { userId } = storeToRefs(useUserIdStore())
 const weatherStore = useWeatherStore()
 const { weather } = storeToRefs(weatherStore)
+const { currentTheme } = useTheme()
 
 // 在應用程式初始化時獲取天氣資料
 onMounted(() => {
   weatherStore.fetchWeather()
 })
-console.log(weather.value)
 const timer = setInterval(
   () => {
-    if (!weatherStore.isFresh.value) {
+    if (!weatherStore.isFresh) {
       weatherStore.fetchWeather()
     }
   },
@@ -40,10 +42,23 @@ const handleLogout = async (): Promise<void> => {
       liff.logout() // 呼叫 LIFF 的登出方法
     }
     router.push('/')
-  } catch (error: Error) {
+  } catch (error) {
     console.error('登出失敗:', error)
   }
 }
+
+watch(weather.value, () => {
+  console.log(weather.value.weathercode)
+  if (weather.value.weathercode === 0 || weather.value.weathercode === 1) {
+    if (currentTheme.value !== 'sakura') {
+      currentTheme.value = 'sakura'
+    }
+  } else {
+    if (currentTheme.value !== 'rain') {
+      currentTheme.value = 'rain'
+    }
+  }
+})
 
 onUnmounted(() => {
   clearInterval(timer)
