@@ -1,28 +1,28 @@
 <template>
-  <div class="">
+  <div class="flex flex-col items-center sm:gap-6 gap-2">
     <div
-      class="w-20 h-20 bg-gradient-to-br from-green-600 to-green-400 rounded-full flex items-center justify-center text-white text-xl font-bold mx-auto mb-4"
+      class="sm:w-20 w-14 sm:h-20 h-14 bg-gradient-to-br from-green-600 to-green-400 rounded-full flex items-center justify-center text-white sm:text-xl text-md font-bold mx-auto"
     >
       LINE
     </div>
-    <h1 class="text-2xl md:text-3xl font-semibold mb-4 text-gray-800">多喝水沒事沒事多喝水</h1>
+    <h1 class="sm:text-2xl md:text-3xl text-md font-semibold text-gray-800">
+      多喝水沒事沒事多喝水
+    </h1>
 
-    <div v-if="loading" class="my-6">
+    <div v-if="loading" class="mt-6">
       <div
         class="animate-spin border-4 border-gray-200 border-t-4 border-t-green-500 rounded-full w-8 h-8 mx-auto mb-2"
       ></div>
       <p class="text-gray-600">載入中</p>
     </div>
 
-    <div v-if="loginError" class="mb-4 bg-red-100 text-red-700 p-4 rounded-lg">
-      {{ loginError }}
+    <div v-if="loginError" class="bg-red-100 text-red-700 sm:p-4 p-2 rounded-lg">
+      {{ loginError }}5222
     </div>
 
     <div v-if="!currentUser && !loading">
-      <p class="text-gray-700 mb-4">請先連結 LINE 帳戶才能享受通知服務</p>
-
       <div class="space-y-4 mb-6 text-left">
-        <div class="flex items-start bg-gray-100 p-4 rounded-lg">
+        <div class="flex items-start bg-gray-100 sm:p-4 p-2 rounded-lg">
           <div
             class="text-white bg-gray-200 rounded-full w-8 h-8 flex items-center justify-center mr-3"
           >
@@ -35,7 +35,7 @@
         </div>
       </div>
       <button
-        class="login-btn bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-full transition transform hover:-translate-y-1 cursor-pointer"
+        class="login-btn bg-green-600 hover:bg-green-700 text-white text-sm sm:py-3 sm:px-6 px-4 py-2 rounded-full transition transform hover:-translate-y-1 cursor-pointer"
         @click="handleLineLogin"
         :disabled="loading"
       >
@@ -124,7 +124,7 @@ const handleLineLogin = async () => {
       console.log('LIFF 未登入，導向登入頁')
       liff.login({ redirectUri: window.location.href })
     }
-  } catch (error: any) {
+  } catch (error) {
     console.error('登入失敗:', error)
     loginError.value = '登入失敗，請重試'
   }

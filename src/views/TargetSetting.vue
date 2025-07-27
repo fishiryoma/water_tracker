@@ -1,10 +1,10 @@
 <template>
-  <h1 class="text-3xl font-bold text-gray-800">已設定的目標</h1>
+  <h1 class="sm:text-3xl text-xl font-bold text-gray-800">已設定的目標</h1>
   <p>
-    <span class="font-semibold text-primary-700 text-3xl">{{ currentTarget }}</span> ml
+    <span class="font-semibold text-primary-700 sm:text-3xl text-xl">{{ currentTarget }}</span> ml
   </p>
   <div class="w-full">
-    <input
+    <FormInput
       type="number"
       step="100"
       id="targetAmount"
@@ -12,26 +12,20 @@
       placeholder="例如: 2000"
       inputmode="numeric"
       pattern="[0-9]*"
-      class="shadow appearance-none rounded w-52 py-3 px-4 text-gray-700 bg-white leading-tight focus:outline-none focus:shadow-outline text-center text-xl"
     />
   </div>
   <div class="flex gap-3">
-    <button
-      @click="saveTarget"
-      class="bg-primary-600/40 hover:bg-primary-600 text-white font-bold py-3 px-6 rounded-xl focus:outline-none focus:shadow-outline transition duration-300 ease-in-out text-lg"
-    >
-      儲存目標
-    </button>
-    <button
-      class="text-primary-200 font-bold py-3 px-6 text-lg hover:text-black transition duration-300"
-    >
+    <Button @click="saveTarget">儲存目標</Button>
+    <Button>
       <RouterLink to="/tracker">返回</RouterLink>
-    </button>
+    </Button>
   </div>
   <p v-if="message" :class="messageTypeClass" class="mt-4 text-sm">{{ message }}</p>
 </template>
 
 <script setup lang="ts">
+import Button from '@/components/Button.vue'
+import FormInput from '@/components/FormInput.vue'
 import { ref, onMounted, computed } from 'vue'
 import { database } from '@/firebase'
 import { ref as dbRef, set, onValue } from 'firebase/database'

@@ -1,13 +1,14 @@
 <template>
-  <h1 class="text-3xl font-bold text-gray-800">今日喝水紀錄</h1>
+  <h1 class="sm:text-3xl text-xl font-bold text-gray-800">今日喝水紀錄</h1>
   <div>
-    <div v-if="remainingWater > 0" class="text-3xl font-bold text-gray-700">
+    <div v-if="remainingWater > 0" class="sm:text-3xl text-xl font-bold text-gray-700">
       {{ dailyTarget }} - {{ todayDrank }} =
       <span class="text-primary-500">{{ remainingWater }}</span>
     </div>
-    <div class="text-lg text-gray-800 mt-2">
+    <div class="sm:text-lg text-md text-gray-800 mt-2">
       <p v-if="remainingWater > 0">
-        還差 <span class="text-2xl font-bold text-primary-500">{{ remainingWater }}</span> ml
+        還差
+        <span class="sm:text-2xl text-md font-bold text-primary-500">{{ remainingWater }}</span> ml
         達到目標
       </p>
       <p v-else class="text-green-700">恭喜！您已達成今日目標！</p>
@@ -23,41 +24,37 @@
     </span>
   </div>
 
-  <div class="grid grid-cols-2 gap-4 w-full max-w-xs">
-    <button
+  <div class="grid grid-cols-2 gap-2 w-full">
+    <Button
       v-for="amount in waterOptions"
       :key="amount"
       @click="addWater(amount)"
-      class="bg-primary-700/30 hover:bg-primary-700/80 text-white font-bold py-3 px-4 rounded-xl focus:outline-none focus:shadow-outline transition duration-300 ease-in-out text-lg"
+      outerClass="w-full sm:w-full"
     >
       +{{ amount }}
-    </button>
+    </Button>
   </div>
 
-  <div class="flex gap-4 items-center">
-    <input
+  <div class="flex gap-4 items-center justify-center w-full">
+    <FormInput
       type="number"
       step="100"
       min="0"
       :max="dailyTarget - todayDrank"
       v-model.number="inputDrank"
-      placeholder="例如: 200"
+      placeholder="例如: 250"
       inputmode="numeric"
       pattern="[0-9]*"
-      class="shadow appearance-none rounded w-52 py-3 px-4 text-gray-700 bg-white leading-tight focus:outline-none focus:shadow-outline text-center text-xl"
     />
-    <button
-      @click="(addWater(inputDrank), (inputDrank = 0))"
-      class="bg-primary-700/30 hover:bg-primary-700/80 text-white font-bold py-3 px-4 w-24 rounded-xl focus:outline-none focus:shadow-outline transition duration-300 ease-in-out text-lg"
-    >
-      送出
-    </button>
+    <Button @click="(addWater(inputDrank), (inputDrank = 0))"> 送出 </Button>
   </div>
 
   <p class="text-gray-400">FYI咖啡跟茶不算水唷</p>
 </template>
 
 <script setup lang="ts">
+import Button from '@/components/Button.vue'
+import FormInput from '@/components/FormInput.vue'
 import { ref, onMounted, computed } from 'vue'
 import { database } from '@/firebase'
 import { ref as dbRef, onValue, update } from 'firebase/database'

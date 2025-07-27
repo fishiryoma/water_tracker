@@ -54,27 +54,30 @@ onUnmounted(() => {
   <BackgroundContainer>
     <img
       src="./assets/bottom-fotor-bg-remover.png"
-      class="w-[100px] mx-auto mt-4 rounded-full bg-amber-100/50"
+      class="sm:w-[100px] w-[75px] mx-auto mt-4 rounded-full bg-amber-100/50"
     />
     <Container>
       <RouterView />
     </Container>
-    <div class="flex justify-between mt-4 max-w-[500px] mx-auto" v-if="userId.length > 0">
-      <!-- <div class="flex justify-between mt-4 max-w-[500px] mx-auto"> -->
+    <div
+      class="flex justify-between mt-4 max-w-[640px] mx-3 sm:mx-auto mb-3 sm:mb-6"
+      v-if="userId.length > 0"
+    >
+      <!-- <div class="flex justify-between mt-4 max-w-[640px] mx-3 sm:mx-auto mb-3 sm:mb-6"> -->
       <div class="flex gap-4">
         <RouterLink to="/target">
-          <img src="@/assets/target.svg" class="w-14" />
+          <img src="@/assets/target.svg" class="sm:w-14 w-10" />
         </RouterLink>
         <RouterLink to="/tracker">
-          <img src="@/assets/drink.svg" class="w-14" />
+          <img src="@/assets/drink.svg" class="sm:w-14 w-10" />
         </RouterLink>
       </div>
       <div>
         <div
           @click="handleLogout"
-          class="flex flex-col items-center justify-center bg-green-600 text-white rounded-full px-4 py-2 hover:opacity-80 cursor-pointer duration-200"
+          class="flex flex-col items-center justify-center bg-amber-400 text-white rounded-full p-1 sm:p-2 hover:opacity-80 cursor-pointer duration-200"
         >
-          <img class="w-7 stroke-orange-50" src="@/assets/door.svg" />
+          <img class="w-7" src="@/assets/door.svg" />
         </div>
       </div>
     </div>
