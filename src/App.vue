@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
-import { onMounted, onUnmounted } from 'vue'
+import { onUnmounted } from 'vue'
 import BackgroundContainer from '@/views/BackgroundContainer.vue'
 import Container from '@/views/Container.vue'
 import liff from '@line/liff'
@@ -18,9 +18,7 @@ const { userId } = storeToRefs(useUserIdStore())
 const weatherStore = useWeatherStore()
 
 // 在應用程式初始化時獲取天氣資料
-onMounted(() => {
-  weatherStore.fetchWeather()
-})
+weatherStore.fetchWeather()
 
 // 定時檢查天氣資料是否需要更新
 const timer = setInterval(

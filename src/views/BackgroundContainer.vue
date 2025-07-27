@@ -7,51 +7,21 @@
 <script setup lang="ts">
 import { onMounted, ref, onBeforeUnmount, watch } from 'vue'
 import { useTheme } from '@/hooks/useTheme'
-import { storeToRefs } from 'pinia'
-import { useWeatherStore } from '@/stores/weather'
 
 const bgContainer = ref<HTMLElement | null>(null)
 let intervalId: NodeJS.Timeout | null = null
 const { currentTheme } = useTheme()
-const weatherStore = useWeatherStore()
-const { weather } = storeToRefs(weatherStore)
-
-// 監聽天氣變化，自動設定主題
-watch(
-  weather,
-  (newWeather) => {
-    if (newWeather.weathercode !== null) {
-      // 根據天氣代碼設定主題
-      if (newWeather.weathercode === 0 || newWeather.weathercode === 1) {
-        // 晴朗天氣 → 櫻花主題
-        if (currentTheme.value !== 'sakura') {
-          currentTheme.value = 'sakura'
-        }
-      } else {
-        // 其他天氣 → 雨天主題
-        if (currentTheme.value !== 'rain') {
-          currentTheme.value = 'rain'
-        }
-      }
-    }
-  },
-  { deep: true },
-)
 
 // 監聽主題變化，更新所有飄落元素的樣式
-watch(
-  currentTheme,
-  (newTheme, oldTheme) => {
-    if (bgContainer.value && oldTheme) {
-      const fallingElements = bgContainer.value.querySelectorAll('.sakura, .rain')
-      fallingElements.forEach((element) => {
-        element.classList.remove(oldTheme)
-        element.classList.add(newTheme)
-      })
-    }
-  },
-  { immediate: false },
-)
+watch(currentTheme, (newTheme) => {
+  if (bgContainer.value) {
+    const fallingElements = bgContainer.value.querySelectorAll('.sakura, .rain')
+    fallingElements.forEach((element) => {
+      element.classList.remove('sakura', 'rain')
+      element.classList.add(newTheme)
+    })
+  }
+})
 
 onMounted(() => {
   // upgrade: 增加花瓣類型, 飄動軌跡更自然

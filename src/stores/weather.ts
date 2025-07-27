@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
+import { useTheme } from '@/hooks/useTheme'
 
 interface WeatherData {
   isInitialized: boolean
@@ -19,6 +20,7 @@ export const useWeatherStore = defineStore('weather', () => {
     // 0, 1晴朗 --> sakura
     // 2, 3多雲 --> rain
   })
+  const { currentTheme } = useTheme()
 
   const fetchWeather = async () => {
     if (weather.value.isInitialized) return
@@ -36,9 +38,22 @@ export const useWeatherStore = defineStore('weather', () => {
         `https://api.open-meteo.com/v1/forecast?latitude=${weather.value.latitude}&longitude=${weather.value.longitude}&current_weather=true`,
       )
       const data = await response.json()
-      weather.value.weathercode = data.current_weather.weathercode
+      const newWeatherCode = data.current_weather.weathercode
+      weather.value.weathercode = newWeatherCode
       weather.value.lastFetchTime = new Date()
       weather.value.isInitialized = true
+      // 更新主題
+      if (newWeatherCode === 0 || newWeatherCode === 1) {
+        // 晴朗天氣 → 櫻花主題
+        if (currentTheme.value !== 'sakura') {
+          currentTheme.value = 'sakura'
+        }
+      } else {
+        // 其他天氣 → 雨天主題
+        if (currentTheme.value !== 'rain') {
+          currentTheme.value = 'rain'
+        }
+      }
     } catch (err) {
       console.error(err)
     }

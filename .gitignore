@@ -29,3 +29,9 @@ coverage
 
 *.tsbuildinfo
 *.env
+
+# Firebase cache
+.firebase/
+firebase-debug.log
+firebase-debug.*.log
+.cache/
