@@ -18,6 +18,8 @@ const { userId } = storeToRefs(useUserIdStore())
 const weatherStore = useWeatherStore()
 
 // 在應用程式初始化時獲取天氣資料
+// 先嘗試載入緩存的天氣資料，如果沒有則獲取新資料
+weatherStore.loadCachedWeather()
 weatherStore.fetchWeather()
 
 // 定時檢查天氣資料是否需要更新

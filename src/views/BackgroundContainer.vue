@@ -1,5 +1,12 @@
 <template>
   <div ref="bgContainer" class="relative bg-primary-200/50 overflow-hidden h-screen">
+    <!-- 天氣載入狀態 -->
+    <div 
+      v-if="weatherStore.weather.isLoading" 
+      class="absolute top-4 left-1/2 transform -translate-x-1/2 z-10 bg-white/80 rounded-lg p-2 shadow-lg"
+    >
+      <LoadingSpinner :show="true" message="正在獲取天氣資料" />
+    </div>
     <slot></slot>
   </div>
 </template>
@@ -7,10 +14,13 @@
 <script setup lang="ts">
 import { onMounted, ref, onBeforeUnmount, watch } from 'vue'
 import { useTheme } from '@/hooks/useTheme'
+import { useWeatherStore } from '@/stores/weather'
+import LoadingSpinner from '@/components/LoadingSpinner.vue'
 
 const bgContainer = ref<HTMLElement | null>(null)
 let intervalId: NodeJS.Timeout | null = null
 const { currentTheme } = useTheme()
+const weatherStore = useWeatherStore()
 
 // 監聽主題變化，更新所有飄落元素的樣式
 watch(currentTheme, (newTheme) => {
