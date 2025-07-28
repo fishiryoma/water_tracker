@@ -16,8 +16,26 @@
       <p class="text-gray-600">載入中</p>
     </div>
 
-    <div v-if="loginError" class="bg-red-100 text-red-700 sm:p-4 p-2 rounded-lg">
-      {{ loginError }}5222
+    <div v-if="loginError" class="bg-amber-100 text-amber-700 sm:p-4 p-2 rounded-lg">
+      {{ loginError }}
+    </div>
+
+    <!-- 在 LINE 內建瀏覽器的特殊提示 -->
+    <div
+      v-if="isInLineApp() && !loading"
+      class="bg-blue-100 text-primary-700 sm:p-4 p-2 rounded-lg mb-4"
+    >
+      <div class="flex items-start">
+        <div class="mr-3">📱</div>
+        <div>
+          <strong class="block mb-2">在 LINE 中開啟的用戶請注意：</strong>
+          <ol class="text-sm space-y-1 list-decimal list-inside">
+            <li>請點擊角落的「⋯」選單</li>
+            <li>選擇「在瀏覽器中開啟」</li>
+            <li>在外部瀏覽器中完成登入</li>
+          </ol>
+        </div>
+      </div>
     </div>
 
     <div v-if="!currentUser && !loading">
@@ -68,16 +86,10 @@ async function initializeLiff() {
     await liff.init({ liffId: '2007574485-nVKgAdK9' })
     liffReady = true
     console.log('LIFF 初始化成功')
-    if (liff.isInClient()) {
-      console.log('在 LIFF 客戶端中')
-      // 使用 liff.openWindow() 在外部瀏覽器中開啟連結
-      liff.openWindow({
-        url: 'https://water-record.web.app/',
-        external: true,
-      })
-    }
+    return true // 表示可以繼續在當前環境操作
   } catch (error) {
     console.error('LIFF 初始化失敗', error)
+    return false
   }
 }
 
@@ -98,6 +110,12 @@ const loginWithLineToken = async (idToken: string) => {
   }
 }
 
+// 檢查是否在 LINE 內建瀏覽器
+const isInLineApp = () => {
+  const userAgent = navigator.userAgent.toLowerCase()
+  return userAgent.includes('line')
+}
+
 // 處理 LINE 登入
 const handleLineLogin = async () => {
   loading.value = true
@@ -106,9 +124,14 @@ const handleLineLogin = async () => {
   try {
     // 等待 LIFF 初始化
     if (!liffReady) {
-      await initializeLiff()
+      const canContinue = await initializeLiff()
+      if (!canContinue) {
+        loading.value = false
+        return
+      }
     }
 
+    // 檢查是否已登入
     if (liff.isLoggedIn()) {
       const idToken = liff.getIDToken()
       if (idToken) {
@@ -118,15 +141,21 @@ const handleLineLogin = async () => {
         router.push('/tracker')
       } else {
         console.log('無 ID Token，重新登入')
-        liff.login({ redirectUri: window.location.href })
+        liff.login({
+          redirectUri: window.location.href,
+        })
       }
     } else {
       console.log('LIFF 未登入，導向登入頁')
-      liff.login({ redirectUri: window.location.href })
+      liff.login({
+        redirectUri: window.location.href,
+      })
     }
   } catch (error) {
     console.error('登入失敗:', error)
     loginError.value = '登入失敗，請重試'
+  } finally {
+    loading.value = false
   }
 }
 
@@ -135,8 +164,8 @@ const checkLoginStatus = async () => {
   loading.value = true
   loginError.value = null
 
-  // 先檢查 Firebase 是否已登入
   try {
+    // 先檢查 Firebase 是否已登入
     if (auth.currentUser) {
       console.log('Firebase 已登入')
       currentUser.value = auth.currentUser
@@ -152,9 +181,13 @@ const checkLoginStatus = async () => {
 
     // 等待 LIFF 初始化
     if (!liffReady) {
-      await initializeLiff()
+      const canContinue = await initializeLiff()
+      if (!canContinue) {
+        return
+      }
     }
 
+    // 檢查 LIFF 登入狀態
     if (liff.isLoggedIn()) {
       const idToken = liff.getIDToken()
       if (idToken) {
