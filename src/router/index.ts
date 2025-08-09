@@ -43,16 +43,18 @@ const router = createRouter({
   ],
 })
 
-router.beforeEach(async(to, _from, next) => {
+router.beforeEach(async (to, _from, next) => {
   const requiresAuth = to.matched.some((route) => route.meta.requiresAuth)
   const currentUser = await getCurrentUser()
   if (requiresAuth) {
-    if (currentUser) {
-      await updateUserData(currentUser as User)
-      next()
-    } else {
-      next({ name: 'login' })
-    }
+    // if (currentUser) {
+    //   await updateUserData(currentUser as User)
+    next()
+    // } else {
+    // next({ name: 'login' })
+    // }
+  } else if (to.name === 'login' && currentUser) {
+    next({ name: 'tracker' })
   } else {
     // 如果路由不需要驗證，則直接允許導航
     console.log('不需要驗證的路由，允許導航')

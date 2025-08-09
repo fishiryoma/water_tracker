@@ -24,7 +24,7 @@
     </span>
   </div>
 
-  <div class="grid grid-cols-2 gap-2 w-full">
+  <div class="grid grid-cols-3 gap-2 w-full">
     <Button
       v-for="amount in waterOptions"
       :key="amount"
@@ -41,7 +41,8 @@
       step="100"
       min="0"
       :max="dailyTarget - todayDrank"
-      v-model.number="inputDrank"
+      :modelValue="inputDrank"
+      @update:modelValue="(val: number) => (inputDrank = val)"
       placeholder="例如: 250"
       inputmode="numeric"
       pattern="[0-9]*"
@@ -59,12 +60,15 @@ import { ref, onMounted, computed } from 'vue'
 import { database } from '@/firebase'
 import { ref as dbRef, onValue, update } from 'firebase/database'
 import { useUserIdStore } from '@/stores/userId'
+import { useGlobalErrorStore } from '@/stores/globalError'
 import { storeToRefs } from 'pinia'
+import { useWaterStore } from '@/stores/water'
 
 const { getUserPath } = storeToRefs(useUserIdStore())
+const errorStore = useGlobalErrorStore()
+const { water: dailyTarget } = storeToRefs(useWaterStore())
 
 // 響應式數據
-const dailyTarget = ref<number>(0) // 每日喝水目標
 const todayDrank = ref<number>(0) // 今日已喝水量
 const inputDrank = ref<number>(0) // input輸入喝水量
 const todayDate = ref<string>('') // 今日日期，格式為 YYYY-MM-DD
@@ -80,7 +84,7 @@ const progressPercentage = computed<number>(() => {
 })
 
 // --- UI ----
-const waterOptions = [250, 500]
+const waterOptions = [350, 500, 750]
 
 // --- Firebase 數據操作 ---
 
@@ -110,6 +114,7 @@ onMounted(() => {
     },
     (error) => {
       console.error('讀取喝水目標失敗:', error)
+      errorStore.handleFirebaseError(error, '讀取喝水目標')
     },
   )
 
@@ -130,6 +135,7 @@ onMounted(() => {
     },
     (error) => {
       console.error('讀取今日喝水紀錄失敗:', error)
+      errorStore.handleFirebaseError(error, '讀取今日喝水紀錄')
     },
   )
 })
@@ -146,6 +152,8 @@ const addWater = async (amount: number) => {
     })
   } catch (error) {
     console.error('增加喝水紀錄失敗:', error)
+    errorStore.handleFirebaseError(error, '增加喝水紀錄')
+    // 錯誤已通過 errorStore 處理，不需要重新拋出
   }
 }
 </script>

@@ -13,7 +13,7 @@ const props = defineProps({
   },
 })
 const defaultCalss =
-  'bg-primary-700/30 hover:bg-primary-700/80 text-white font-bold sm:py-3 sm:w-24 w-20 py-2 rounded-xl focus:outline-none focus:shadow-outline transition duration-300 ease-in-out sm:text-lg text-sm'
+  'bg-primary-700/30 hover:bg-primary-700/80 text-white font-bold sm:py-3 sm:w-24 w-20 py-2 rounded-xl focus:outline-none focus:shadow-outline transition duration-300 ease-in-out sm:text-lg text-sm cursor-pointer'
 
 const mergedClass = computed(() => {
   return [defaultCalss, props.outerClass]

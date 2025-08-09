@@ -1,5 +1,5 @@
 <template>
-  <input :class="mergedClass" v-bind="$attrs" />
+  <input :class="mergedClass" v-model="model" v-bind="$attrs" />
 </template>
 
 <script setup lang="ts">
@@ -9,11 +9,17 @@ defineOptions({
 })
 
 const props = defineProps({
+  modelValue: {
+    type: [String, Number],
+    default: null,
+  },
   outerClass: {
     type: [String, Array],
     default: '',
   },
 })
+
+const model = defineModel<number | string | null>({ default: null })
 
 const mergedClass = computed(() => {
   return [

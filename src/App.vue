@@ -1,21 +1,25 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
+import { RouterView } from 'vue-router'
 import { onUnmounted } from 'vue'
 import BackgroundContainer from '@/views/BackgroundContainer.vue'
 import Container from '@/views/Container.vue'
+import GlobalErrorHandler from '@/components/GlobalErrorHandler.vue'
+import MenuBtn from '@/components/MenuBtn.vue'
 import liff from '@line/liff'
 
 import { useRouter } from 'vue-router'
 import { useUserIdStore } from '@/stores/userId'
-import { storeToRefs } from 'pinia'
+// import { storeToRefs } from 'pinia'
 import { useWeatherStore } from '@/stores/weather'
+import { useGlobalErrorStore } from '@/stores/globalError'
 import { auth } from '@/firebase' // 導入 Firebase Auth 實例
 import { signOut } from 'firebase/auth' // <-- 這裡新增導入 signOut
 
 const router = useRouter()
 const { setUserId } = useUserIdStore()
-const { userId } = storeToRefs(useUserIdStore())
+// const { userId } = storeToRefs(useUserIdStore())
 const weatherStore = useWeatherStore()
+const errorStore = useGlobalErrorStore()
 
 // 在應用程式初始化時獲取天氣資料
 // 先嘗試載入緩存的天氣資料，如果沒有則獲取新資料
@@ -42,6 +46,7 @@ const handleLogout = async (): Promise<void> => {
     router.push('/')
   } catch (error) {
     console.error('登出失敗:', error)
+    errorStore.showError('登出失敗', '請重新嘗試登出操作')
   }
 }
 
@@ -59,29 +64,13 @@ onUnmounted(() => {
     <Container>
       <RouterView />
     </Container>
-    <div
-      class="flex justify-between mt-4 max-w-[640px] mx-3 sm:mx-auto mb-3 sm:mb-6"
-      v-if="userId.length > 0"
-    >
-      <!-- <div class="flex justify-between mt-4 max-w-[640px] mx-3 sm:mx-auto mb-3 sm:mb-6"> -->
-      <div class="flex gap-4">
-        <RouterLink to="/target">
-          <img src="@/assets/target.svg" class="sm:w-14 w-10" />
-        </RouterLink>
-        <RouterLink to="/tracker">
-          <img src="@/assets/drink.svg" class="sm:w-14 w-10" />
-        </RouterLink>
-      </div>
-      <div>
-        <div
-          @click="handleLogout"
-          class="flex flex-col items-center justify-center bg-amber-400 text-white rounded-full p-1 sm:p-2 hover:opacity-80 cursor-pointer duration-200"
-        >
-          <img class="w-7" src="@/assets/door.svg" />
-        </div>
-      </div>
-    </div>
+    <!-- 測試用 -->
+    <MenuBtn :handleLogout="handleLogout" />
+    <!-- <MenuBtn :handleLogout="handleLogout" v-if="userId.length > 0"/> -->
   </BackgroundContainer>
+
+  <!-- 全局錯誤處理器 -->
+  <GlobalErrorHandler />
 </template>
 
 <style>

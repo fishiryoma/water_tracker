@@ -20,70 +20,43 @@
       <RouterLink to="/tracker">返回</RouterLink>
     </Button>
   </div>
-  <p v-if="message" :class="messageTypeClass" class="mt-4 text-sm">{{ message }}</p>
+  <p v-if="successMessage" class="mt-4 text-sm text-green-600 font-medium">{{ successMessage }}</p>
 </template>
 
 <script setup lang="ts">
 import Button from '@/components/Button.vue'
 import FormInput from '@/components/FormInput.vue'
-import { ref, onMounted, computed } from 'vue'
+import { ref } from 'vue'
 import { database } from '@/firebase'
-import { ref as dbRef, set, onValue } from 'firebase/database'
+import { ref as dbRef, set } from 'firebase/database'
 import { useUserIdStore } from '@/stores/userId'
+import { useGlobalErrorStore } from '@/stores/globalError'
 import { storeToRefs } from 'pinia'
+import { useWaterStore } from '@/stores/water'
 
 const { getUserPath } = storeToRefs(useUserIdStore())
+const { water: currentTarget } = storeToRefs(useWaterStore())
+const errorStore = useGlobalErrorStore()
 const testId = `${getUserPath.value}/waterTarget`
-
 const targetAmount = ref<number | null>(null)
-const currentTarget = ref<number>(0)
-const message = ref<string>('')
-const messageType = ref<string>('')
-
-const messageTypeClass = computed(() => {
-  return {
-    'text-green-600': messageType.value === 'success',
-    'text-red-600': messageType.value === 'error',
-  }
-})
-
-onMounted(() => {
-  const targetRef = dbRef(database, testId)
-
-  onValue(
-    targetRef,
-    (snapshot) => {
-      const data = snapshot.val()
-      if (data !== null) {
-        currentTarget.value = data
-        targetAmount.value = data
-      } else {
-        currentTarget.value = 1000
-      }
-    },
-    (error) => {
-      console.error('讀取喝水目標失敗:', error)
-      message.value = '讀取目標失敗，請檢查網路或 Firebase 設定。'
-      messageType.value = 'error'
-    },
-  )
-})
+const successMessage = ref<string>('')
 
 const saveTarget = async () => {
   if (targetAmount.value === null || targetAmount.value <= 0) {
-    message.value = '你要確定欸⁉️'
-    messageType.value = 'error'
+    errorStore.showWarning('請輸入有效的目標數值')
     return
   }
 
   try {
     await set(dbRef(database, testId), targetAmount.value)
-    message.value = '✅目標更新成功'
-    messageType.value = 'success'
+    successMessage.value = '✅目標更新成功'
+    targetAmount.value = null
+    setTimeout(() => {
+      successMessage.value = ''
+    }, 3000)
   } catch (error) {
     console.error('儲存喝水目標失敗:', error)
-    message.value = '儲存目標失敗，請檢查網路或 Firebase 設定。'
-    messageType.value = 'error'
+    errorStore.handleFirebaseError(error, '儲存喝水目標')
   }
 }
 </script>

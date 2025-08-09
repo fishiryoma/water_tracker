@@ -16,21 +16,18 @@
       <p class="text-gray-600">載入中</p>
     </div>
 
-    <div v-if="loginError" class="bg-amber-100 text-amber-700 sm:p-4 p-2 rounded-lg">
-      {{ loginError }}
-    </div>
 
     <!-- 在 LINE 內建瀏覽器的特殊提示 -->
     <div
       v-if="isInLineApp() && !loading"
-      class="bg-blue-100 text-primary-700 sm:p-4 p-2 rounded-lg mb-4"
+      class="bg-blue-100 text-blue-700 sm:p-4 p-2 rounded-lg mb-4"
     >
       <div class="flex items-start">
         <div class="mr-3">📱</div>
         <div>
           <strong class="block mb-2">在 LINE 中開啟的用戶請注意：</strong>
           <ol class="text-sm space-y-1 list-decimal list-inside">
-            <li>請點擊角落的「⋯」選單</li>
+            <li>點擊右上角的「⋯」選單</li>
             <li>選擇「在瀏覽器中開啟」</li>
             <li>在外部瀏覽器中完成登入</li>
           </ol>
@@ -71,13 +68,14 @@ import { auth } from '@/firebase'
 import { OAuthProvider, signInWithCredential } from 'firebase/auth'
 import type { User } from 'firebase/auth'
 import { updateUserData } from '@/hooks/useUpdateUser'
+import { useGlobalErrorStore } from '@/stores/globalError'
 
 import liff from '@line/liff'
 
 const currentUser = ref<User | null>(null)
-const loginError = ref<string | null>(null)
 const loading = ref(false)
 const router = useRouter()
+const errorStore = useGlobalErrorStore()
 
 // 初始化 LIFF
 let liffReady = false
@@ -89,6 +87,7 @@ async function initializeLiff() {
     return true // 表示可以繼續在當前環境操作
   } catch (error) {
     console.error('LIFF 初始化失敗', error)
+    errorStore.handleNetworkError(error, 'LIFF 初始化')
     return false
   }
 }
@@ -106,6 +105,7 @@ const loginWithLineToken = async (idToken: string) => {
     return result.user
   } catch (error) {
     console.error('Firebase 登入失敗:', error)
+    errorStore.handleFirebaseError(error, 'Firebase 登入')
     throw error
   }
 }
@@ -119,7 +119,6 @@ const isInLineApp = () => {
 // 處理 LINE 登入
 const handleLineLogin = async () => {
   loading.value = true
-  loginError.value = null
 
   try {
     // 等待 LIFF 初始化
@@ -153,7 +152,7 @@ const handleLineLogin = async () => {
     }
   } catch (error) {
     console.error('登入失敗:', error)
-    loginError.value = '登入失敗，請重試'
+    errorStore.handleNetworkError(error, '用戶登入')
   } finally {
     loading.value = false
   }
@@ -162,7 +161,6 @@ const handleLineLogin = async () => {
 // 檢查登入狀態
 const checkLoginStatus = async () => {
   loading.value = true
-  loginError.value = null
 
   try {
     // 先檢查 Firebase 是否已登入
@@ -174,7 +172,7 @@ const checkLoginStatus = async () => {
         router.push('/tracker')
       } catch (error) {
         console.error('更新使用者資料失敗:', error)
-        loginError.value = '更新使用者資料失敗，請重新登入'
+        errorStore.handleFirebaseError(error, '更新使用者資料')
       }
       return
     }
@@ -198,7 +196,7 @@ const checkLoginStatus = async () => {
           router.push('/tracker')
         } catch (error) {
           console.error('自動登入失敗:', error)
-          loginError.value = '自動登入失敗，請重新登入'
+          errorStore.handleNetworkError(error, '自動登入')
         }
       }
     }
