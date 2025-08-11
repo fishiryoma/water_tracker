@@ -14,7 +14,23 @@
       <p v-else class="text-green-700">恭喜！您已達成今日目標！</p>
     </div>
   </div>
-  <div class="w-full bg-gray-200 rounded-full h-6 relative overflow-hidden">
+
+  <!-- 取代原本的長條進度條 -->
+  <CircularProgress
+    :percentage="progressPercentage"
+    :show-water="true"
+    :duration="1.5"
+    :size="200"
+  >
+    <template #center>
+      <div class="flex flex-col items-center z-10">
+        <span class="text-2xl font-bold text-gray-800"> {{ progressPercentage.toFixed(0) }}% </span>
+        <span class="text-xs text-gray-500"> {{ todayDrank }} / {{ dailyTarget }} ml </span>
+      </div>
+    </template>
+  </CircularProgress>
+
+  <!-- <div class="w-full bg-gray-200 rounded-full h-6 relative overflow-hidden">
     <div
       class="bg-amber-300 h-6 rounded-full transition-all duration-500 ease-out"
       :style="{ width: progressPercentage + '%' }"
@@ -22,7 +38,7 @@
     <span class="absolute inset-0 flex items-center justify-center text-sm font-bold text-gray-800">
       {{ progressPercentage.toFixed(0) }}%
     </span>
-  </div>
+  </div> -->
 
   <div class="grid grid-cols-3 gap-2 w-full">
     <Button
@@ -63,6 +79,7 @@ import { useUserIdStore } from '@/stores/userId'
 import { useGlobalErrorStore } from '@/stores/globalError'
 import { storeToRefs } from 'pinia'
 import { useWaterStore } from '@/stores/water'
+import CircularProgress from '@/components/CircularProgress.vue'
 
 const { getUserPath } = storeToRefs(useUserIdStore())
 const errorStore = useGlobalErrorStore()

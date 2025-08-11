@@ -13,7 +13,7 @@
     <div>
       <div
         @click="props.handleLogout"
-        class="flex flex-col items-center justify-center rounded-r-lg bg-amber-400 text-white px-4 sm:px-6 py-1 sm:py-2 hover:opacity-80 cursor-pointer duration-200"
+        class="flex flex-col items-center justify-center rounded-r-lg bg-primary-300/70 text-gray-600 px-4 sm:px-6 py-1 sm:py-2 hover:opacity-80 cursor-pointer duration-200"
       >
         <ArrowTopRightOnSquareIcon class="sm:w-8 w-6" />
         <p class="text-xs sm:text-sm">登出</p>
