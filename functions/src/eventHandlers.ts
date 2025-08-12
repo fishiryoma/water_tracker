@@ -6,6 +6,7 @@ import {
   createGeneralReply,
   replayTotalDrink,
   isLoginMessage,
+  replayWeeklyRecord,
 } from './messages'
 
 /**
@@ -22,9 +23,9 @@ export async function handleFollowEvent(event: any, accessToken: string, secret:
     // 準備用戶資料
     const userData: UserData = {
       lineUserId: userId,
-      displayName: profile?.displayName,
-      pictureUrl: profile?.pictureUrl,
-      statusMessage: profile?.statusMessage,
+      displayName: profile?.displayName || '未設定',
+      pictureUrl: profile?.pictureUrl || '未設定',
+      statusMessage: profile?.statusMessage || '未設定',
       joinedAt: new Date().toISOString(),
       lastActiveAt: new Date().toISOString(),
       isActive: true,
@@ -72,10 +73,13 @@ export async function handleTextMessage(event: any, accessToken: string, secret:
   const userMessage = event.message.text
   console.log(`✅ 收到來自 ${userId} 的訊息: "${userMessage}"`)
 
-  const drinkAmount = Number(userMessage.trim())
+  const isNumber = Number(userMessage.trim())
+  const drinkAmount = isNumber && isNumber > 0 ? isNumber : NaN
+  const isQueryRecord = userMessage.includes('查詢')
   try {
     const drinkData = await getDrinkData(userId)
-    const drinkUpdate = !isNaN(drinkAmount) && drinkAmount < drinkData.waterTarget
+    const drinkUpdate =
+      !isNaN(drinkAmount) && drinkAmount < drinkData.waterTarget - drinkData.totalDrank
 
     // 更新用戶活動時間
     if (drinkUpdate) {
@@ -88,8 +92,10 @@ export async function handleTextMessage(event: any, accessToken: string, secret:
     let replyMsg
     if (isLoginMessage(userMessage)) {
       replyMsg = createLoginMessage()
+    } else if (isQueryRecord) {
+      replyMsg = replayWeeklyRecord()
     } else if (drinkUpdate) {
-      replyMsg = replayTotalDrink(drinkData.totalDrank, drinkAmount)
+      replyMsg = replayTotalDrink(drinkData.totalDrank + drinkAmount)
     } else {
       replyMsg = createGeneralReply(drinkData.totalDrank)
     }

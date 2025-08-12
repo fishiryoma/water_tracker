@@ -57,10 +57,7 @@ onUnmounted(() => {
 
 <template>
   <BackgroundContainer>
-    <img
-      src="./assets/bottom-fotor-bg-remover.png"
-      class="sm:w-[100px] w-[75px] mx-auto mt-4 rounded-full bg-amber-100/50"
-    />
+    <img src="./assets/logo_Tw.png" class="sm:w-[100px] w-[75px] mx-auto mt-4 rounded-full" />
     <Container>
       <RouterView />
     </Container>

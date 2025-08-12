@@ -1,44 +1,16 @@
 <template>
-  <h1 class="sm:text-3xl text-xl font-bold text-gray-800">今日喝水紀錄</h1>
-  <div>
-    <div v-if="remainingWater > 0" class="sm:text-3xl text-xl font-bold text-gray-700">
-      {{ dailyTarget }} - {{ todayDrank }} =
-      <span class="text-primary-500">{{ remainingWater }}</span>
-    </div>
-    <div class="sm:text-lg text-md text-gray-800 mt-2">
-      <p v-if="remainingWater > 0">
-        還差
-        <span class="sm:text-2xl text-md font-bold text-primary-500">{{ remainingWater }}</span> ml
-        達到目標
-      </p>
-      <p v-else class="text-green-700">恭喜！您已達成今日目標！</p>
-    </div>
-  </div>
-
-  <!-- 取代原本的長條進度條 -->
-  <CircularProgress
-    :percentage="progressPercentage"
-    :show-water="true"
-    :duration="1.5"
-    :size="200"
-  >
+  <CircularProgress :percentage="progressPercentage">
     <template #center>
-      <div class="flex flex-col items-center z-10">
+      <div v-if="remainingWater > 0" class="flex flex-col items-center z-1 gap-1">
         <span class="text-2xl font-bold text-gray-800"> {{ progressPercentage.toFixed(0) }}% </span>
-        <span class="text-xs text-gray-500"> {{ todayDrank }} / {{ dailyTarget }} ml </span>
+        <span class="text-sm text-gray-800 font-bold"> {{ todayDrank }} / {{ dailyTarget }} ml </span>
+      </div>
+      <div v-else class="flex flex-col items-center z-1 gap-2">
+        <div class="text-2xl font-bold text-sky-800">達 成</div>
+        <span class="text-sm text-sky-800 font-bold"> {{ todayDrank }} ml </span>
       </div>
     </template>
   </CircularProgress>
-
-  <!-- <div class="w-full bg-gray-200 rounded-full h-6 relative overflow-hidden">
-    <div
-      class="bg-amber-300 h-6 rounded-full transition-all duration-500 ease-out"
-      :style="{ width: progressPercentage + '%' }"
-    ></div>
-    <span class="absolute inset-0 flex items-center justify-center text-sm font-bold text-gray-800">
-      {{ progressPercentage.toFixed(0) }}%
-    </span>
-  </div> -->
 
   <div class="grid grid-cols-3 gap-2 w-full">
     <Button
@@ -80,6 +52,7 @@ import { useGlobalErrorStore } from '@/stores/globalError'
 import { storeToRefs } from 'pinia'
 import { useWaterStore } from '@/stores/water'
 import CircularProgress from '@/components/CircularProgress.vue'
+import { formatDateToTaiwan } from '@/utils'
 
 const { getUserPath } = storeToRefs(useUserIdStore())
 const errorStore = useGlobalErrorStore()
@@ -107,11 +80,7 @@ const waterOptions = [350, 500, 750]
 
 // 取得今天的日期 (YYYY-MM-DD 格式)
 const getTodayDate = (): string => {
-  const date = new Date()
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
-  return `${year}-${month}-${day}`
+  return formatDateToTaiwan(new Date())
 }
 
 onMounted(() => {
@@ -159,13 +128,16 @@ onMounted(() => {
 
 // 增加喝水量
 const addWater = async (amount: number) => {
+  if (todayDrank.value >= dailyTarget.value) return
+
   const newTotalDrank = todayDrank.value + amount
   const recordPath = `${getUserPath.value}/dailyRecords/${todayDate.value}`
 
+  const isOverTarget = newTotalDrank >= dailyTarget.value
   try {
     await update(dbRef(database, recordPath), {
-      totalDrank: newTotalDrank,
-      [`logs/${Date.now()}`]: amount, // 紀錄每次喝水時間和數量
+      totalDrank: isOverTarget ? dailyTarget.value : newTotalDrank,
+      [`logs/${Date.now()}`]: isOverTarget ? dailyTarget.value - todayDrank.value : amount, // 紀錄每次喝水時間和數量
     })
   } catch (error) {
     console.error('增加喝水紀錄失敗:', error)

@@ -1,4 +1,3 @@
-import * as crypto from 'crypto'
 import { UserData } from './types'
 import { Message, Client } from '@line/bot-sdk'
 import { db } from './config'
@@ -9,19 +8,6 @@ const getTodayDate = (): string => {
   const month = String(date.getMonth() + 1).padStart(2, '0')
   const day = String(date.getDate()).padStart(2, '0')
   return `${year}-${month}-${day}`
-}
-
-/**
- * 驗證 LINE Webhook 簽名
- */
-export function validateSignature(body: string, signature: string, secret: string): boolean {
-  try {
-    const hash = crypto.createHmac('sha256', secret).update(body, 'utf8').digest('base64')
-    return hash === signature
-  } catch (error) {
-    console.error('簽名計算錯誤:', error)
-    return false
-  }
 }
 
 /**
