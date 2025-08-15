@@ -3,7 +3,9 @@
     <template #center>
       <div v-if="remainingWater > 0" class="flex flex-col items-center z-1 gap-1">
         <span class="text-2xl font-bold text-gray-800"> {{ progressPercentage.toFixed(0) }}% </span>
-        <span class="text-sm text-gray-800 font-bold"> {{ todayDrank }} / {{ dailyTarget }} ml </span>
+        <span class="text-sm text-gray-800 font-bold">
+          {{ todayDrank }} / {{ dailyTarget }} ml
+        </span>
       </div>
       <div v-else class="flex flex-col items-center z-1 gap-2">
         <div class="text-2xl font-bold text-sky-800">達 成</div>
@@ -38,13 +40,15 @@
     <Button @click="(addWater(inputDrank), (inputDrank = 0))"> 送出 </Button>
   </div>
 
+  <Clender :weeklyDrank="weekDates" />
+
   <p class="text-gray-400">FYI咖啡跟茶不算水唷</p>
 </template>
 
 <script setup lang="ts">
 import Button from '@/components/Button.vue'
 import FormInput from '@/components/FormInput.vue'
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted, computed, reactive } from 'vue'
 import { database } from '@/firebase'
 import { ref as dbRef, onValue, update } from 'firebase/database'
 import { useUserIdStore } from '@/stores/userId'
@@ -52,7 +56,8 @@ import { useGlobalErrorStore } from '@/stores/globalError'
 import { storeToRefs } from 'pinia'
 import { useWaterStore } from '@/stores/water'
 import CircularProgress from '@/components/CircularProgress.vue'
-import { formatDateToTaiwan } from '@/utils'
+import { formatDateToTaiwan, getWeekDay } from '@/utils'
+import Clender from '@/components/Clender.vue'
 
 const { getUserPath } = storeToRefs(useUserIdStore())
 const errorStore = useGlobalErrorStore()
@@ -62,6 +67,8 @@ const { water: dailyTarget } = storeToRefs(useWaterStore())
 const todayDrank = ref<number>(0) // 今日已喝水量
 const inputDrank = ref<number>(0) // input輸入喝水量
 const todayDate = ref<string>('') // 今日日期，格式為 YYYY-MM-DD
+const weekDates = reactive<Record<string, { finished: boolean; status: string }>>({}) // 本周的 7 個日期字串
+const unsubs: Array<() => void> = [] // Firebase 監聽取消函式收集
 
 // 計算屬性
 const remainingWater = computed<number>(() => {
@@ -88,20 +95,22 @@ onMounted(() => {
 
   // 1. 監聽每日喝水目標
   const targetRef = dbRef(database, `${getUserPath.value}/waterTarget`)
-  onValue(
-    targetRef,
-    (snapshot) => {
-      const data = snapshot.val()
-      if (data !== null) {
-        dailyTarget.value = data
-      } else {
-        dailyTarget.value = 0
-      }
-    },
-    (error) => {
-      console.error('讀取喝水目標失敗:', error)
-      errorStore.handleFirebaseError(error, '讀取喝水目標')
-    },
+  unsubs.push(
+    onValue(
+      targetRef,
+      (snapshot) => {
+        const data = snapshot.val()
+        if (data !== null) {
+          dailyTarget.value = data
+        } else {
+          dailyTarget.value = 0
+        }
+      },
+      (error) => {
+        console.error('讀取喝水目標失敗:', error)
+        errorStore.handleFirebaseError(error, '讀取喝水目標')
+      },
+    ),
   )
 
   // 2. 監聽今日已喝水量
@@ -109,21 +118,48 @@ onMounted(() => {
     database,
     `${getUserPath.value}/dailyRecords/${todayDate.value}/totalDrank`,
   )
-  onValue(
-    todayDrankRef,
-    (snapshot) => {
-      const data = snapshot.val()
-      if (data !== null) {
-        todayDrank.value = data
-      } else {
-        todayDrank.value = 0 // 如果今天還沒有紀錄，則為 0
-      }
-    },
-    (error) => {
-      console.error('讀取今日喝水紀錄失敗:', error)
-      errorStore.handleFirebaseError(error, '讀取今日喝水紀錄')
-    },
+  unsubs.push(
+    onValue(
+      todayDrankRef,
+      (snapshot) => {
+        const data = snapshot.val()
+        if (data !== null) {
+          todayDrank.value = data
+        } else {
+          todayDrank.value = 0 // 如果今天還沒有紀錄，則為 0
+        }
+      },
+      (error) => {
+        console.error('讀取今日喝水紀錄失敗:', error)
+        errorStore.handleFirebaseError(error, '讀取今日喝水紀錄')
+      },
+    ),
   )
+
+  // 3. 監聽本周的喝水數據
+  const recordsRef = dbRef(database, `${getUserPath.value}/dailyRecords`)
+  unsubs.push(
+    onValue(
+      recordsRef,
+      (snapshot) => {
+        const allRecords = snapshot.val() || {}
+        for (const data of getWeekDay()) {
+          weekDates[data.date] = {
+            finished: allRecords[data.date]?.finished ?? false,
+            status: data.status,
+          }
+        }
+      },
+      (error) => {
+        console.error('讀取 weekly 資料失敗:', error)
+        errorStore.handleFirebaseError(error, '讀取 weekly 資料')
+      },
+    ),
+  )
+})
+
+onUnmounted(() => {
+  unsubs.forEach((fn) => fn())
 })
 
 // 增加喝水量
@@ -133,16 +169,16 @@ const addWater = async (amount: number) => {
   const newTotalDrank = todayDrank.value + amount
   const recordPath = `${getUserPath.value}/dailyRecords/${todayDate.value}`
 
-  const isOverTarget = newTotalDrank >= dailyTarget.value
+  const isFinished = newTotalDrank >= dailyTarget.value
   try {
     await update(dbRef(database, recordPath), {
-      totalDrank: isOverTarget ? dailyTarget.value : newTotalDrank,
-      [`logs/${Date.now()}`]: isOverTarget ? dailyTarget.value - todayDrank.value : amount, // 紀錄每次喝水時間和數量
+      finished: isFinished,
+      totalDrank: isFinished ? dailyTarget.value : newTotalDrank,
+      [`logs/${Date.now()}`]: isFinished ? dailyTarget.value - todayDrank.value : amount,
     })
   } catch (error) {
     console.error('增加喝水紀錄失敗:', error)
     errorStore.handleFirebaseError(error, '增加喝水紀錄')
-    // 錯誤已通過 errorStore 處理，不需要重新拋出
   }
 }
 </script>

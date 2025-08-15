@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
 import { onUnmounted } from 'vue'
-import BackgroundContainer from '@/views/BackgroundContainer.vue'
-import Container from '@/views/Container.vue'
+import BackgroundContainer from '@/components/BackgroundContainer.vue'
+import Container from '@/components/Container.vue'
 import GlobalErrorHandler from '@/components/GlobalErrorHandler.vue'
 import MenuBtn from '@/components/MenuBtn.vue'
 import liff from '@line/liff'
