@@ -5,12 +5,14 @@
       {{ day }}
     </ClenderDay>
     <ClenderDay v-for="(data, index) in Object.values(renderedIcon)" :key="index" className="py-3">
-      <template v-if="data.status === 'future'"> <MinusIcon class="text-primary-800 size-6" /> </template>
+      <template v-if="data.status === 'future'">
+        <MinusIcon class="text-primary-800 size-6" />
+      </template>
       <template v-else-if="data.finished">
-        <FaceSmileIcon class="text-sky-800 size-6 stroke-2" />
+        <img src="@/assets/ok.svg" class="size-7" />
       </template>
       <template v-else-if="data.finished === false && data.status === 'pass'">
-        <FaceFrownIcon class="text-primary-800 size-6" />
+        <img src="@/assets/fail.svg" class="size-4" />
       </template>
       <template v-else> <StarIcon class="text-amber-300 size-6" /> </template>
     </ClenderDay>
@@ -20,8 +22,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import ClenderDay from './ClenderDay.vue'
-import { FaceFrownIcon } from '@heroicons/vue/24/outline'
-import { FaceSmileIcon } from '@heroicons/vue/24/outline'
 import { MinusIcon } from '@heroicons/vue/24/outline'
 import { StarIcon } from '@heroicons/vue/24/solid'
 

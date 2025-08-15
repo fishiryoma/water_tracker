@@ -40,7 +40,7 @@
     <Button @click="(addWater(inputDrank), (inputDrank = 0))"> 送出 </Button>
   </div>
 
-  <Clender :weeklyDrank="weekDates" />
+  <ClenderPanel :weeklyDrank="weekDates" />
 
   <p class="text-gray-400">FYI咖啡跟茶不算水唷</p>
 </template>
@@ -57,7 +57,7 @@ import { storeToRefs } from 'pinia'
 import { useWaterStore } from '@/stores/water'
 import CircularProgress from '@/components/CircularProgress.vue'
 import { formatDateToTaiwan, getWeekDay } from '@/utils'
-import Clender from '@/components/Clender.vue'
+import ClenderPanel from '@/components/ClenderPanel.vue'
 
 const { getUserPath } = storeToRefs(useUserIdStore())
 const errorStore = useGlobalErrorStore()
