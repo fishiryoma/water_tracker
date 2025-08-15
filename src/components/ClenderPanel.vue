@@ -6,10 +6,10 @@
     </ClenderDay>
     <ClenderDay v-for="(data, index) in Object.values(renderedIcon)" :key="index" className="py-3">
       <template v-if="data.status === 'future'">
-        <MinusIcon class="text-primary-800 size-6" />
+        <MinusIcon class="text-primary-800 size-4" />
       </template>
       <template v-else-if="data.finished">
-        <img src="@/assets/ok.svg" class="size-7" />
+        <img src="@/assets/ok.svg" class="size-6" />
       </template>
       <template v-else-if="data.finished === false && data.status === 'pass'">
         <img src="@/assets/fail.svg" class="size-4" />

@@ -1,8 +1,8 @@
 <template>
   <div ref="bgContainer" class="relative bg-primary-200/50 overflow-hidden h-screen">
     <!-- 天氣載入狀態 -->
-    <div 
-      v-if="weatherStore.weather.isLoading" 
+    <div
+      v-if="weatherStore.weather.isLoading"
       class="absolute top-4 left-1/2 transform -translate-x-1/2 z-10 bg-white/80 rounded-lg p-2 shadow-lg"
     >
       <LoadingSpinner :show="true" message="正在獲取天氣資料" />
@@ -12,15 +12,18 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, onBeforeUnmount, watch } from 'vue'
+import { onMounted, ref, onBeforeUnmount, watch, nextTick } from 'vue'
 import { useTheme } from '@/hooks/useTheme'
 import { useWeatherStore } from '@/stores/weather'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
+import { gsap } from 'gsap'
 
 const bgContainer = ref<HTMLElement | null>(null)
-let intervalId: NodeJS.Timeout | null = null
 const { currentTheme } = useTheme()
 const weatherStore = useWeatherStore()
+
+let spawnTl: gsap.core.Timeline | null = null
+let ctx: gsap.Context | null = null
 
 // 監聽主題變化，更新所有飄落元素的樣式
 watch(currentTheme, (newTheme) => {
@@ -33,89 +36,96 @@ watch(currentTheme, (newTheme) => {
   }
 })
 
-onMounted(() => {
-  // upgrade: 增加花瓣類型, 飄動軌跡更自然
+onMounted(async () => {
+  await nextTick()
+  ctx = gsap.context(() => {
+    const host = bgContainer.value ?? document.body
 
-  function createPetal() {
-    const fallingComponent = document.createElement('div')
-    fallingComponent.classList.add(currentTheme.value)
+    const spawnOne = () => {
+      const el = document.createElement('div')
+      el.classList.add(currentTheme.value)
+      el.style.position = 'absolute'
+      el.style.top = '-80px'
+      el.style.pointerEvents = 'none'
+      el.style.willChange = 'transform'
+      const rect = host.getBoundingClientRect()
+      const left = Math.random() * rect.width
+      el.style.left = `${left}px`
+      const baseOpacity = gsap.utils.random(0.6, 1)
+      el.style.opacity = String(baseOpacity)
+      host.appendChild(el)
 
-    if (bgContainer.value) {
-      fallingComponent.style.left = Math.random() * bgContainer.value.offsetWidth + 'px'
-    } else {
-      fallingComponent.style.left = Math.random() * window.innerWidth + 'px'
+      // 依主題調整參數
+      const isRain = currentTheme.value === 'rain'
+      const duration = isRain ? gsap.utils.random(4.5, 7) : gsap.utils.random(7, 12)
+      const drift = isRain ? gsap.utils.random(-40, 40) : gsap.utils.random(-160, 160)
+      const rot = isRain ? gsap.utils.random(-20, 20) : gsap.utils.random(-180, 180)
+      const swayDur = isRain ? gsap.utils.random(1.2, 1.8) : gsap.utils.random(1.6, 2.4)
+      const swayAmp = isRain ? gsap.utils.random(6, 16) : gsap.utils.random(12, 28)
+      const fallEase = isRain ? 'elastic.out(0.5, 0.5)' : 'power1.out'
+
+      // 主要下落 tween
+      const fall = gsap.to(el, {
+        y: rect.height + 140,
+        x: `+=${drift}`,
+        rotation: rot,
+        duration,
+        ease: fallEase,
+        onComplete: () => {
+          gsap.killTweensOf(el)
+          el.remove()
+        },
+      })
+
+      // 水平擺動（相對 x）
+      gsap.to(el, {
+        x: `+=${swayAmp}`,
+        duration: swayDur,
+        ease: 'sine.inOut',
+        yoyo: true,
+        repeat: Math.ceil(duration / swayDur),
+      })
+
+      return fall
     }
-    fallingComponent.style.animationDuration = 5 + Math.random() * 5 + 's'
-    fallingComponent.style.opacity = Math.random().toString()
 
-    if (bgContainer.value) {
-      bgContainer.value.appendChild(fallingComponent)
-    }
-
-    setTimeout(() => {
-      fallingComponent.remove()
-    }, 10000)
-  }
-
-  intervalId = setInterval(() => {
-    createPetal()
-  }, 300)
+    // 生成時間軸（可依主題/天氣調整密度）
+    const spawnRate = 0.3 // 秒
+    spawnTl = gsap.timeline({ repeat: -1 })
+    spawnTl.call(() => {
+      // 每個tick生成 1~2 個
+      const count = gsap.utils.random(1, 2, 1)
+      for (let i = 0; i < count; i++) spawnOne()
+    }, undefined, 0).to({}, { duration: spawnRate })
+  })
 })
 
 onBeforeUnmount(() => {
-  if (intervalId) {
-    clearInterval(intervalId)
-  }
+  if (spawnTl) spawnTl.kill()
+  if (ctx) ctx.revert()
 })
 </script>
 
 <style>
-/* 飄落元素樣式 */
-.sakura {
-  position: absolute;
-  top: -50px;
-  width: 36px;
-  height: 36px;
-  background-image: url('../assets/petal.png');
-  background-size: contain;
-  background-repeat: no-repeat;
-  pointer-events: none;
-  animation: sakuraFall linear infinite;
-  z-index: 0;
-}
-
+/* 飄落元素樣式（由 GSAP 控制，不再使用 CSS keyframes） */
+.sakura,
 .rain {
   position: absolute;
   top: -50px;
+  pointer-events: none;
+  z-index: 0;
+  background-size: contain;
+  background-repeat: no-repeat;
+  will-change: transform;
+}
+.sakura {
+  width: 36px;
+  height: 36px;
+  background-image: url('../assets/petal.png');
+}
+.rain {
   width: 60px;
   height: 60px;
   background-image: url('../assets/raindrop2.png');
-  background-size: contain;
-  background-repeat: no-repeat;
-  pointer-events: none;
-  animation: rainFall linear infinite;
-  z-index: 0;
-}
-
-@keyframes sakuraFall {
-  0% {
-    transform: translateY(0) rotate(0deg);
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(100vh) rotate(360deg);
-    opacity: 0.2;
-  }
-}
-
-@keyframes rainFall {
-  0% {
-    transform: translateY(0) rotate(15deg);
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(100vh) rotate(0deg);
-    opacity: 0.2;
-  }
 }
 </style>
