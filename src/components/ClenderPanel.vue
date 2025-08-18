@@ -103,15 +103,16 @@ const glint = (el: HTMLElement) => {
   const rect = el.getBoundingClientRect()
   const cx = rect.left + rect.width / 2
   const cy = rect.top + rect.height / 2
-  const size = Math.max(rect.width, rect.height)
+  const iconSize = Math.max(rect.width, rect.height)
+  const glintSize = iconSize * 0.3
 
   const streak = document.createElement('div')
   streak.style.cssText = `
-      position: fixed; left:${cx}px; top:${cy}px; transform: translate(-50%, -50%) translateX(-100%);
-      width:${size}px; height:${size}px; border-radius: 50%;
-      background: radial-gradient(ellipse 60% 100%, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.4) 40%, rgba(255,255,255,0) 100%);
+      position: fixed; left:${cx - iconSize * 0.35}px; top:${cy}px; transform: translate(-50%, -50%);
+      width:${glintSize}px; height:${iconSize}px; border-radius: 50%;
+      background: radial-gradient(ellipse 70% 100%, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.4) 40%, rgba(255,255,255,0) 100%);
       mix-blend-mode: screen; pointer-events:none; opacity:0; z-index:9999; will-change: transform, opacity;
-      filter: blur(1px);
+      filter: blur(2px);
     `
   document.body.appendChild(streak)
 
@@ -119,8 +120,10 @@ const glint = (el: HTMLElement) => {
     onComplete: () => streak.remove(),
   })
 
+  const moveDistance = iconSize * 0.8
+
   tl.to(streak, { opacity: 1, duration: 0.08, ease: 'power2.out' })
-    .to(streak, { x: size * 0.5 , duration: 0.5, ease: 'power2.inOut' }, '<')
+    .to(streak, { x: moveDistance, duration: 0.5, ease: 'power2.inOut' }, '<')
     .to(streak, { opacity: 0, duration: 0.2, ease: 'power2.in' }, '<0.3')
   return tl
 }
