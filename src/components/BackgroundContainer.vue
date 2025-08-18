@@ -92,11 +92,17 @@ onMounted(async () => {
     // 生成時間軸（可依主題/天氣調整密度）
     const spawnRate = 0.3 // 秒
     spawnTl = gsap.timeline({ repeat: -1 })
-    spawnTl.call(() => {
-      // 每個tick生成 1~2 個
-      const count = gsap.utils.random(1, 2, 1)
-      for (let i = 0; i < count; i++) spawnOne()
-    }, undefined, 0).to({}, { duration: spawnRate })
+    spawnTl
+      .call(
+        () => {
+          // 每個tick生成 1~2 個
+          const count = gsap.utils.random(1, 2, 1)
+          for (let i = 0; i < count; i++) spawnOne()
+        },
+        undefined,
+        0,
+      )
+      .to({}, { duration: spawnRate })
   })
 })
 

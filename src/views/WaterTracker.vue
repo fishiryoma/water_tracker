@@ -187,11 +187,11 @@ const launchWaterDroplet = (fromEl: HTMLElement, toEl: HTMLElement, amount: numb
 
 const createDroplet = (amount: number) => {
   const droplet = document.createElement('div')
-  const size = Math.max(10, 40 * Math.min(1, amount / dailyTarget.value))
+  const size = Math.max(10, 35 * Math.min(1, amount / dailyTarget.value))
   droplet.style.cssText = `
       position: fixed; left: 0px; top: 0px;
       width: ${size}px; height: ${size}px;
-      border-radius: 50%; background: radial-gradient(circle at 30% 30%, rgba(135,206,250,0.9), rgba(30,144,255,0.8));
+      border-radius: 50%; background: radial-gradient(circle at 30% 30%, rgba(135,206,250,0.7), rgba(30,144,255,0.6));
       box-shadow: 0 2px 8px rgba(30,144,255,0.4);
       z-index: 10000; pointer-events: none;
     `
