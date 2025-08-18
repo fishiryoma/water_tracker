@@ -1,5 +1,5 @@
 <template>
-  <div class="w-42 h-42 relative flex items-center justify-center">
+  <div class="w-42 h-42 relative flex items-center justify-center" ref="rootEl">
     <svg class="absolute inset-0" viewBox="0 0 100 100">
       <!-- 定義漸變和濾鏡 -->
       <defs>
@@ -98,7 +98,7 @@
 </template>
 
 <script setup lang="ts">
-import { watch, nextTick, ref, computed, onMounted } from 'vue'
+import { watch, nextTick, ref, computed, onMounted, defineExpose } from 'vue'
 import { gsap } from 'gsap'
 
 const props = defineProps({
@@ -107,6 +107,8 @@ const props = defineProps({
     default: 0,
   },
 })
+
+const rootEl = ref<HTMLDivElement | null>(null)
 
 const progressCircleRef = ref<SVGCircleElement | null>(null)
 // const waterRef = ref<SVGRectElement | null>(null)
@@ -276,6 +278,8 @@ watch(
     exciteWaves(intensity)
   },
 )
+
+defineExpose({ rootEl, exciteWaves })
 
 onMounted(async () => {
   await nextTick()

@@ -1,5 +1,5 @@
 <template>
-  <CircularProgress :percentage="progressPercentage">
+  <CircularProgress ref="circularProgressRef" :percentage="progressPercentage">
     <template #center>
       <div v-if="remainingWater > 0" class="flex flex-col items-center z-1 gap-1">
         <span class="text-2xl font-bold text-gray-800"> {{ progressPercentage.toFixed(0) }}% </span>
@@ -18,7 +18,7 @@
     <Button
       v-for="amount in waterOptions"
       :key="amount"
-      @click="addWater(amount)"
+      @click="addWater(amount, $event)"
       outerClass="w-full sm:w-full"
     >
       +{{ amount }}
@@ -37,7 +37,9 @@
       inputmode="numeric"
       pattern="[0-9]*"
     />
-    <Button @click="(addWater(inputDrank), (inputDrank = 0))"> 送出 </Button>
+    <Button ref="cusButton" @click="(addWater(inputDrank, $event), (inputDrank = 0))">
+      送出
+    </Button>
   </div>
 
   <ClenderPanel :weeklyDrank="weekDates" />
@@ -58,6 +60,10 @@ import { useWaterStore } from '@/stores/water'
 import CircularProgress from '@/components/CircularProgress.vue'
 import { formatDateToTaiwan, getWeekDay } from '@/utils'
 import ClenderPanel from '@/components/ClenderPanel.vue'
+import { gsap } from 'gsap'
+import { MotionPathPlugin } from 'gsap/MotionPathPlugin'
+
+gsap.registerPlugin(MotionPathPlugin)
 
 const { getUserPath } = storeToRefs(useUserIdStore())
 const errorStore = useGlobalErrorStore()
@@ -65,10 +71,11 @@ const { water: dailyTarget } = storeToRefs(useWaterStore())
 
 // 響應式數據
 const todayDrank = ref<number>(0) // 今日已喝水量
-const inputDrank = ref<number>(0) // input輸入喝水量
+const inputDrank = ref<number>(1) // input輸入喝水量
 const todayDate = ref<string>('') // 今日日期，格式為 YYYY-MM-DD
 const weekDates = reactive<Record<string, { finished: boolean; status: string }>>({}) // 本周的 7 個日期字串
 const unsubs: Array<() => void> = [] // Firebase 監聽取消函式收集
+const circularProgressRef = ref<InstanceType<typeof CircularProgress> | null>(null)
 
 // 計算屬性
 const remainingWater = computed<number>(() => {
@@ -162,24 +169,107 @@ onUnmounted(() => {
   unsubs.forEach((fn) => fn())
 })
 
+const calculateTrajectory = (fromEl: HTMLElement, toEl: HTMLElement) => {
+  const fromRect = fromEl.getBoundingClientRect()
+  const toRect = toEl.getBoundingClientRect()
+  const start = { x: fromRect.left + fromRect.width / 2, y: fromRect.top + fromRect.height / 2 }
+  const end = { x: toRect.left + toRect.width / 2, y: toRect.top + toRect.height / 2 }
+  const mid = { x: (start.x + end.x) / 2, y: Math.min(start.y, end.y) - 80 }
+  return { start, mid, end }
+}
+
+// 水珠飛行函式
+const launchWaterDroplet = (fromEl: HTMLElement, toEl: HTMLElement, amount: number) => {
+  const droplet = createDroplet(amount)
+  const trajectory = calculateTrajectory(fromEl, toEl)
+  animateDroplet(droplet, trajectory)
+}
+
+const createDroplet = (amount: number) => {
+  const droplet = document.createElement('div')
+  const size = Math.max(10, 40 * Math.min(1, amount / dailyTarget.value))
+  droplet.style.cssText = `
+      position: fixed; left: 0px; top: 0px;
+      width: ${size}px; height: ${size}px;
+      border-radius: 50%; background: radial-gradient(circle at 30% 30%, rgba(135,206,250,0.9), rgba(30,144,255,0.8));
+      box-shadow: 0 2px 8px rgba(30,144,255,0.4);
+      z-index: 10000; pointer-events: none;
+    `
+  return droplet
+}
+
+interface Trajectory {
+  start: { x: number; y: number }
+  mid: { x: number; y: number }
+  end: { x: number; y: number }
+}
+
+const animateDroplet = (droplet: HTMLElement, trajectory: Trajectory) => {
+  document.body.appendChild(droplet)
+
+  gsap.set(droplet, {
+    x: trajectory.start.x - 10,
+    y: trajectory.start.y - 10,
+    scale: 0.5,
+  })
+
+  const tl = gsap.timeline({
+    onComplete: () => {
+      droplet.remove()
+      circularProgressRef.value?.exciteWaves()
+    },
+  })
+
+  // 先放大
+  tl.to(droplet, { scale: 1, duration: 0.1 })
+    .to(
+      droplet,
+      {
+        motionPath: {
+          path: `M${trajectory.start.x},${trajectory.start.y} Q${trajectory.mid.x},${trajectory.mid.y} ${trajectory.end.x},${trajectory.end.y}`,
+          autoRotate: false,
+        },
+        rotation: 360,
+        duration: 0.8,
+        ease: 'power2.out',
+      },
+      '<',
+    )
+    // 最後縮小淡出
+    .to(droplet, { scale: 0.3, opacity: 0.7, duration: 0.3 }, '<0.5')
+}
+
 // 增加喝水量
-const addWater = async (amount: number) => {
-  if (todayDrank.value >= dailyTarget.value) return
+const addWater = async (amount: number, event: Event) => {
+  if (todayDrank.value >= dailyTarget.value || amount <= 0) return
+  // 1. 先發射水珠動畫
+  const targetEl = circularProgressRef.value?.rootEl
+  const buttonEl = event.target as HTMLElement
+  if (!targetEl) return
 
-  const newTotalDrank = todayDrank.value + amount
-  const recordPath = `${getUserPath.value}/dailyRecords/${todayDate.value}`
+  launchWaterDroplet(buttonEl, targetEl, amount)
 
-  const isFinished = newTotalDrank >= dailyTarget.value
-  try {
-    await update(dbRef(database, recordPath), {
-      finished: isFinished,
-      totalDrank: isFinished ? dailyTarget.value : newTotalDrank,
-      [`logs/${Date.now()}`]: isFinished ? dailyTarget.value - todayDrank.value : amount,
-    })
-  } catch (error) {
-    console.error('增加喝水紀錄失敗:', error)
-    errorStore.handleFirebaseError(error, '增加喝水紀錄')
+  const updateWaterData = async (amount: number) => {
+    const newTotalDrank = todayDrank.value + amount
+    const recordPath = `${getUserPath.value}/dailyRecords/${todayDate.value}`
+
+    const isFinished = newTotalDrank >= dailyTarget.value
+    try {
+      await update(dbRef(database, recordPath), {
+        finished: isFinished,
+        totalDrank: isFinished ? dailyTarget.value : newTotalDrank,
+        [`logs/${Date.now()}`]: isFinished ? dailyTarget.value - todayDrank.value : amount,
+      })
+    } catch (error) {
+      console.error('增加喝水紀錄失敗:', error)
+      errorStore.handleFirebaseError(error, '增加喝水紀錄')
+    }
   }
+
+  // 2. 延遲更新數據（等水珠到達）
+  setTimeout(() => {
+    updateWaterData(amount)
+  }, 800) // 飛行時間
 }
 </script>
 
