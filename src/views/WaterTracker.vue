@@ -8,7 +8,7 @@
         </span>
       </div>
       <div v-else class="flex flex-col items-center z-1 gap-2">
-        <div class="text-2xl font-bold text-sky-800">達 成</div>
+        <div class="text-2xl font-bold text-sky-800 shiny-text">達 成</div>
         <span class="text-sm text-sky-800 font-bold"> {{ todayDrank }} ml </span>
       </div>
     </template>
@@ -71,7 +71,7 @@ const { water: dailyTarget } = storeToRefs(useWaterStore())
 
 // 響應式數據
 const todayDrank = ref<number>(0) // 今日已喝水量
-const inputDrank = ref<number>(1) // input輸入喝水量
+const inputDrank = ref<number>(0) // input輸入喝水量
 const todayDate = ref<string>('') // 今日日期，格式為 YYYY-MM-DD
 const weekDates = reactive<Record<string, { finished: boolean; status: string }>>({}) // 本周的 7 個日期字串
 const unsubs: Array<() => void> = [] // Firebase 監聽取消函式收集
