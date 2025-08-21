@@ -9,7 +9,7 @@ import liff from '@line/liff'
 
 import { useRouter } from 'vue-router'
 import { useUserIdStore } from '@/stores/userId'
-// import { storeToRefs } from 'pinia'
+import { storeToRefs } from 'pinia'
 import { useWeatherStore } from '@/stores/weather'
 import { useGlobalErrorStore } from '@/stores/globalError'
 import { auth } from '@/firebase' // 導入 Firebase Auth 實例
@@ -17,7 +17,7 @@ import { signOut } from 'firebase/auth' // <-- 這裡新增導入 signOut
 
 const router = useRouter()
 const { setUserId } = useUserIdStore()
-// const { userId } = storeToRefs(useUserIdStore())
+const { userId } = storeToRefs(useUserIdStore())
 const weatherStore = useWeatherStore()
 const errorStore = useGlobalErrorStore()
 
@@ -75,5 +75,22 @@ onUnmounted(() => {
   font-family: 'Huninn', sans-serif;
   font-weight: 400;
   font-style: normal;
+}
+.shiny-text {
+  text-shadow: 0 0 0 rgba(255, 255, 255, 1);
+  animation: glow-pulse 2s infinite ease-in-out;
+}
+
+@keyframes glow-pulse {
+  0%,
+  100% {
+    text-shadow: 0 0 0 rgba(255, 255, 255, 1);
+  }
+  50% {
+    text-shadow:
+      0 0 4px rgba(255, 255, 255, 0.9),
+      0 0 8px rgba(255, 255, 255, 0.7),
+      0 0 10px rgba(255, 255, 255, 0.5);
+  }
 }
 </style>

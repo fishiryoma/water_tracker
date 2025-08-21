@@ -50,15 +50,16 @@
 <script setup lang="ts">
 import Button from '@/components/Button.vue'
 import FormInput from '@/components/FormInput.vue'
-import { ref, onMounted, onUnmounted, computed, reactive } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { database } from '@/firebase'
 import { ref as dbRef, onValue, update } from 'firebase/database'
 import { useUserIdStore } from '@/stores/userId'
 import { useGlobalErrorStore } from '@/stores/globalError'
 import { storeToRefs } from 'pinia'
 import { useWaterStore } from '@/stores/water'
+import { useWeeklyStore } from '@/stores/weekly'
 import CircularProgress from '@/components/CircularProgress.vue'
-import { formatDateToTaiwan, getWeekDay } from '@/utils'
+import { formatDateToTaiwan, getWeekDates, weekStatus } from '@/utils'
 import ClenderPanel from '@/components/ClenderPanel.vue'
 import { gsap } from 'gsap'
 import { MotionPathPlugin } from 'gsap/MotionPathPlugin'
@@ -68,12 +69,13 @@ gsap.registerPlugin(MotionPathPlugin)
 const { getUserPath } = storeToRefs(useUserIdStore())
 const errorStore = useGlobalErrorStore()
 const { water: dailyTarget } = storeToRefs(useWaterStore())
+const { addSubscriber, removeSubscriber } = useWeeklyStore()
+const { weeklyDrank } = storeToRefs(useWeeklyStore())
 
 // 響應式數據
 const todayDrank = ref<number>(0) // 今日已喝水量
 const inputDrank = ref<number>(0) // input輸入喝水量
 const todayDate = ref<string>('') // 今日日期，格式為 YYYY-MM-DD
-const weekDates = reactive<Record<string, { finished: boolean; status: string }>>({}) // 本周的 7 個日期字串
 const unsubs: Array<() => void> = [] // Firebase 監聽取消函式收集
 const circularProgressRef = ref<InstanceType<typeof CircularProgress> | null>(null)
 
@@ -85,6 +87,17 @@ const remainingWater = computed<number>(() => {
 const progressPercentage = computed<number>(() => {
   if (dailyTarget.value === 0) return 0
   return Math.min(100, (todayDrank.value / dailyTarget.value) * 100)
+})
+
+const weekDates = computed(() => {
+  const result: Record<string, { finished: boolean; status: string }> = {}
+  for (const data of weekStatus(getWeekDates())) {
+    result[data.date] = {
+      finished: weeklyDrank.value?.[data.date]?.finished ?? false,
+      status: data.status,
+    }
+  }
+  return result
 })
 
 // --- UI ----
@@ -143,30 +156,13 @@ onMounted(() => {
     ),
   )
 
-  // 3. 監聽本周的喝水數據
-  const recordsRef = dbRef(database, `${getUserPath.value}/dailyRecords`)
-  unsubs.push(
-    onValue(
-      recordsRef,
-      (snapshot) => {
-        const allRecords = snapshot.val() || {}
-        for (const data of getWeekDay()) {
-          weekDates[data.date] = {
-            finished: allRecords[data.date]?.finished ?? false,
-            status: data.status,
-          }
-        }
-      },
-      (error) => {
-        console.error('讀取 weekly 資料失敗:', error)
-        errorStore.handleFirebaseError(error, '讀取 weekly 資料')
-      },
-    ),
-  )
+  // 3. 監聽本周的喝水數據 -> 改由 weekly store 統一處理
+  addSubscriber()
 })
 
 onUnmounted(() => {
   unsubs.forEach((fn) => fn())
+  removeSubscriber()
 })
 
 const calculateTrajectory = (fromEl: HTMLElement, toEl: HTMLElement) => {

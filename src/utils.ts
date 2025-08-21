@@ -18,27 +18,51 @@ export const formatDateToTaiwan = (date: Date): string => {
 }
 
 /**
- * 取得本週的 7 個日期字串
+ * 取得 7 個日期字串
  */
-export const getWeekDay = () => {
-  const today = new Date()
-
-  // 計算本週的週日
+export const getWeekDates = (wholeWeek: boolean = false, date?: string): string[] => {
+  const today = date ? new Date(date) : new Date()
   const dayOfWeek = today.getDay() // 0 = Sunday
   const sunday = new Date(today)
   sunday.setDate(today.getDate() - dayOfWeek)
 
-  // 產生本週的到今日的日期字串
-  const weekDates: { date: string; status: string; finished: boolean | null }[] = []
-  for (let i = 0; i < dayOfWeek + 1; i++) {
+  const dates: string[] = []
+  for (let i = 0; i < (wholeWeek ? 6 : dayOfWeek) + 1; i++) {
     const d = new Date(sunday)
     d.setDate(sunday.getDate() + i)
-    weekDates.push({
-      date: d.toISOString().slice(0, 10),
-      status: i === dayOfWeek ? 'today' : 'pass',
-      finished: null,
-    })
+    dates.push(d.toISOString().slice(0, 10))
   }
 
-  return weekDates
+  return dates
+}
+
+/**
+ * 將日期字串轉換為包含狀態的物件
+ */
+export const weekStatus = (
+  dates: string[],
+  todayStr: string = new Date().toISOString().slice(0, 10),
+): { date: string; status: string; finished: boolean | null }[] => {
+  return dates.map((date) => ({
+    date,
+    status: date === todayStr ? 'today' : 'pass',
+    finished: null,
+  }))
+}
+
+export const generateMonthDates = (year: number, month: number): string[] => {
+  const daysInMonth = new Date(year, month, 0).getDate() // month 是 1~12
+  const today = new Date()
+  const todayStr = formatDateToTaiwan(today)
+  const dates: string[] = []
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+
+    // 只加入今天及以前的日期
+    if (dateStr <= todayStr) {
+      dates.push(dateStr)
+    }
+  }
+  return dates
 }

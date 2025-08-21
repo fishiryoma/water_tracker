@@ -28,7 +28,9 @@ import { gsap } from 'gsap'
 
 const weekdayTw = ['日', '一', '二', '三', '四', '五', '六']
 
-const props = defineProps<{ weeklyDrank: Record<string, { finished: boolean; status: string }> }>()
+const props = defineProps<{
+  weeklyDrank: Record<string, { finished: boolean; status: string; }>
+}>()
 const gridRef = ref<HTMLDivElement | null>(null)
 
 const renderedIcon = computed(() => {

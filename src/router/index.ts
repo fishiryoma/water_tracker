@@ -36,6 +36,18 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
+      path: '/clender',
+      name: 'clender',
+      component: () => import('@/views/MonthClender.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/weekIntake/:date',
+      name: 'weekIntake',
+      component: () => import('@/views/IntakeChart.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
       path: '/',
       name: 'login',
       component: Login,
@@ -51,7 +63,7 @@ router.beforeEach(async (to, _from, next) => {
     //   await updateUserData(currentUser as User)
     next()
     // } else {
-    // next({ name: 'login' })
+    //   next({ name: 'login' })
     // }
   } else if (to.name === 'login' && currentUser) {
     next({ name: 'tracker' })
