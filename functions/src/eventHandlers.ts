@@ -6,7 +6,6 @@ import {
   createGeneralReply,
   replayTotalDrink,
   isLoginMessage,
-  replayWeeklyRecord,
 } from './messages'
 
 /**
@@ -75,7 +74,6 @@ export async function handleTextMessage(event: any, accessToken: string, secret:
 
   const isNumber = Number(userMessage.trim())
   const drinkAmount = isNumber && isNumber > 0 ? isNumber : NaN
-  const isQueryRecord = userMessage.includes('查詢')
   try {
     const drinkData = await getDrinkData(userId)
     const drinkUpdate =
@@ -92,8 +90,6 @@ export async function handleTextMessage(event: any, accessToken: string, secret:
     let replyMsg
     if (isLoginMessage(userMessage)) {
       replyMsg = createLoginMessage()
-    } else if (isQueryRecord) {
-      replyMsg = replayWeeklyRecord()
     } else if (drinkUpdate) {
       replyMsg = replayTotalDrink(drinkData.totalDrank + drinkAmount)
     } else {

@@ -1,5 +1,5 @@
 <template>
-  <p class="mt-4 text-primary-800">本周喝水達標表</p>
+  <p class="mt-4 text-primary-800">本週喝水達標表</p>
   <div ref="gridRef" class="grid grid-cols-7 border-2 border-primary-800/50 rounded-lg px-3">
     <ClenderDay v-for="day in weekdayTw" :key="day" className="border-b-2 border-primary-800/50">
       {{ day }}

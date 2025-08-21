@@ -33,11 +33,10 @@ export function createGeneralReply(totalDrank: number): Message {
 /**
  * 回覆喝水總量
  */
-export function replayTotalDrink(totalDrank: number, drinkAmount: number): Message {
-  const total = drinkAmount < totalDrank ? totalDrank + drinkAmount : totalDrank
+export function replayTotalDrink(totalDrank: number): Message {
   return {
     type: 'text',
-    text: `🔺今日已喝${total}mL🤩💓`,
+    text: `🔺今日已喝${totalDrank}mL🤩💓`,
   }
 }
 
