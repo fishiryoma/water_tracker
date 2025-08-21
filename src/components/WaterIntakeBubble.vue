@@ -15,6 +15,8 @@ import {
   LinearScale,
   TimeScale,
   BarElement,
+  BubbleController,
+  BarController,
 } from 'chart.js'
 import { Chart } from 'vue-chartjs'
 import type { ChartData, ChartOptions } from 'chart.js'
@@ -30,6 +32,8 @@ ChartJS.register(
   TimeScale,
   annotationPlugin,
   BarElement,
+  BubbleController,
+  BarController,
 )
 
 const props = defineProps<{
@@ -151,8 +155,8 @@ const chartOptions = computed<ChartOptions<'bubble' | 'bar'>>(() => {
         callbacks: {
           label: (ctx: any) => {
             if (ctx.dataset.type === 'bubble') {
-              const { ml } = ctx.raw as any
-              return `${ml} mL`
+              const { ml, y } = ctx.raw as any
+              return `${y}點 - ${ml} mL`
             }
             if (ctx.dataset.type === 'bar') {
               const { y } = ctx.raw as any
@@ -174,10 +178,10 @@ const chartOptions = computed<ChartOptions<'bubble' | 'bar'>>(() => {
       position: 'right',
       title: {
         display: true,
-        text: '總量 (mL)',
+        text: '總量 (L)',
       },
       ticks: {
-        callback: (value) => value.toString(), // 去掉千分位
+        callback: (value) => (Number(value) / 1000).toFixed(1), // 去掉千分位
       },
 
       grid: {

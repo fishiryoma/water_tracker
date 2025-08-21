@@ -16,18 +16,14 @@
       <p class="text-gray-600">載入中</p>
     </div>
 
-
     <!-- 在 LINE 內建瀏覽器的特殊提示 -->
-    <div
-      v-if="isInLineApp() && !loading"
-      class="bg-blue-100 text-blue-700 sm:p-4 p-2 rounded-lg mb-4"
-    >
+    <div v-if="isInLineApp() && !loading" class="text-primary-700 sm:p-4 p-2 rounded-lg mb-4">
       <div class="flex items-start">
         <div class="mr-3">📱</div>
         <div>
           <strong class="block mb-2">在 LINE 中開啟的用戶請注意：</strong>
           <ol class="text-sm space-y-1 list-decimal list-inside">
-            <li>點擊右上角的「⋯」選單</li>
+            <li>請點擊角落的「⋯」選單</li>
             <li>選擇「在瀏覽器中開啟」</li>
             <li>在外部瀏覽器中完成登入</li>
           </ol>
@@ -50,6 +46,7 @@
         </div>
       </div>
       <button
+        v-if="!isInLineApp() && !loading"
         class="login-btn bg-green-600 hover:bg-green-700 text-white text-sm sm:py-3 sm:px-6 px-4 py-2 rounded-full transition transform hover:-translate-y-1 cursor-pointer"
         @click="handleLineLogin"
         :disabled="loading"
