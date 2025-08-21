@@ -13,14 +13,14 @@
     <div class="flex justify-center gap-2">
       <div class="flex items-center gap-2">
         <div class="w-4 h-4 rounded-full bg-[#FF5A79]"></div>
-        <div>未完成</div>
+        <div>{{ $t('CLENDER.UNFINISHED') }}</div>
       </div>
       <div class="flex items-center gap-2">
         <div class="w-4 h-4 rounded-full bg-[#699F4C]"></div>
-        <div>已完成</div>
+        <div>{{ $t('CLENDER.FINISHED') }}</div>
       </div>
     </div>
-    <div>本月完成率: {{ Math.round((completedDaysCount / attributes.length) * 100) || 0 }}%</div>
+    <div>{{ $t('CLENDER.RATIO') }}：{{ Math.round((completedDaysCount / attributes.length) * 100) || 0 }}%</div>
   </div>
 </template>
 
@@ -33,10 +33,13 @@ import { useUserIdStore } from '@/stores/userId'
 import { storeToRefs } from 'pinia'
 import { useGlobalErrorStore } from '@/stores/globalError'
 import { formatDateToTaiwan, generateMonthDates } from '@/utils'
+import { useI18n } from 'vue-i18n'
 
 const router = useRouter()
+
 const { getUserPath } = storeToRefs(useUserIdStore())
 const errorStore = useGlobalErrorStore()
+const { t } = useI18n()
 
 const _red = '#FF5A79'
 const _green = '#699F4C'
@@ -141,7 +144,7 @@ const loadMonthlyData = async () => {
     monthlyRecords.value = result
   } catch (error) {
     console.error('讀取月份資料失敗:', error)
-    errorStore.handleFirebaseError(error, '讀取月份資料')
+    errorStore.handleFirebaseError(error, t('ERROR.MONTH'))
   }
 }
 
@@ -162,7 +165,7 @@ const watchTodayData = () => {
     },
     (error) => {
       console.error('監聽今日資料失敗:', error)
-      errorStore.handleFirebaseError(error, '監聽今日資料')
+      errorStore.handleFirebaseError(error, t('ERROR.TODAY'))
       todayRecord.value = { finished: false }
     },
   )

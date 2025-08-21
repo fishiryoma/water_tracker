@@ -1,0 +1,86 @@
+{
+  "MENU": {
+    "TARGET": "更改目標",
+    "TRACKER": "今日飲水量",
+    "CALENDAR": "完成月曆",
+    "LOGOUT": "登出"
+  },
+  "TITLE": {
+    "TARGET": "目標喝水量",
+    "STATISTICS": "一週喝水統計"
+  },
+  "BUTTON": {
+    "SEND": "送出",
+    "CHANGE": "更改目標",
+    "CLEAR_ALL": "清除所有通知",
+    "LINK_LINE": "🔗 連結 LINE 帳戶"
+  },
+  "TRACKER": {
+    "SUBTITLE": "本週喝水達標表",
+    "NOTE": "FYI咖啡跟茶不算水唷",
+    "SUCCESS": "達 成"
+  },
+  "CLENDER": {
+    "UNFINISHED": "未完成",
+    "FINISHED": "完成",
+    "RATIO": "本月完成率"
+  },
+  "STATISTICS": {
+    "Y_TIME": "喝水時間",
+    "Y_TOTAL": "總量 (L)",
+    "X_TIME": "本週日期",
+    "LINE": "中午",
+    "HOUR": "點"
+  },
+  "LOADING": {
+    "WEATHER": "正在獲取天氣資料",
+    "DEFAULT": "載入中..."
+  },
+  "LOGIN": {
+    "SLOGAN": "多喝水沒事，沒事多喝水",
+    "LINE_NOTICE_TITLE": "在 LINE 中開啟的用戶請注意：",
+    "LINE_NOTICE_STEP1": "請點擊角落的「⋯」選單",
+    "LINE_NOTICE_STEP2": "選擇「在瀏覽器中開啟」",
+    "LINE_NOTICE_STEP3": "在外部瀏覽器中完成登入",
+    "FEATURE_REMINDER_TITLE": "每日喝水提醒",
+    "FEATURE_REMINDER_DESC": "根據您的偏好發送客製化內容"
+  },
+  "PLACEHOLDER": {
+    "TARGET": "例如: 2000",
+    "WATER_INTAKE": "例如: 250"
+  },
+  "SUCCESS": {
+    "TARGET_UPDATED": "✅目標更新成功"
+  },
+  "ERROR": {
+    "MONTH": "讀取月份資料",
+    "TODAY": "監聽今日資料",
+    "READ_TARGET": "讀取喝水目標",
+    "READ_TODAY": "讀取今日資料",
+    "ADD_WATER": "增加喝水紀錄",
+    "INVALID_TARGET": "請輸入有效的目標數值",
+    "SAVE_TARGET": "儲存喝水目標",
+    "UPDATE_TODAY_RECORD": "更新今日喝水紀錄",
+    "LOGOUT_FAILED_TITLE": "登出失敗",
+    "LOGOUT_FAILED_DETAILS": "請重新嘗試登出操作",
+    "UPDATE_USER_DATA": "更新用戶資料",
+    "WEEKLY_LISTENER": "監聽 weekly 資料",
+    "LIFF_INIT": "LIFF 初始化",
+    "FIREBASE_LOGIN": "Firebase 登入",
+    "USER_LOGIN": "用戶登入",
+    "AUTO_LOGIN": "自動登入"
+  },
+  "WEEKDAYS_SHORT": [
+    "日",
+    "一",
+    "二",
+    "三",
+    "四",
+    "五",
+    "六"
+  ],
+  "CHART": {
+    "BUBBLE_LABEL": "單次飲水",
+    "BAR_LABEL": "每日總量"
+  }
+}

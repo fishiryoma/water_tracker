@@ -8,7 +8,7 @@
         </span>
       </div>
       <div v-else class="flex flex-col items-center z-1 gap-2">
-        <div class="text-2xl font-bold text-sky-800 shiny-text">達 成</div>
+        <div class="text-2xl font-bold text-sky-800 shiny-text">{{ $t('TRACKER.SUCCESS') }}</div>
         <span class="text-sm text-sky-800 font-bold"> {{ todayDrank }} ml </span>
       </div>
     </template>
@@ -33,18 +33,18 @@
       :max="dailyTarget - todayDrank"
       :modelValue="inputDrank"
       @update:modelValue="(val: number) => (inputDrank = val)"
-      placeholder="例如: 250"
+      :placeholder="t('PLACEHOLDER.WATER_INTAKE')"
       inputmode="numeric"
       pattern="[0-9]*"
     />
     <Button ref="cusButton" @click="(addWater(inputDrank, $event), (inputDrank = 0))">
-      送出
+      {{ $t('BUTTON.SEND') }}
     </Button>
   </div>
 
   <ClenderPanel :weeklyDrank="weekDates" />
 
-  <p class="text-gray-400">FYI咖啡跟茶不算水唷</p>
+  <p class="text-gray-400">{{ $t('TRACKER.NOTE') }}</p>
 </template>
 
 <script setup lang="ts">
@@ -63,6 +63,9 @@ import { formatDateToTaiwan, getWeekDates, weekStatus } from '@/utils'
 import ClenderPanel from '@/components/ClenderPanel.vue'
 import { gsap } from 'gsap'
 import { MotionPathPlugin } from 'gsap/MotionPathPlugin'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 gsap.registerPlugin(MotionPathPlugin)
 
@@ -128,7 +131,7 @@ onMounted(() => {
       },
       (error) => {
         console.error('讀取喝水目標失敗:', error)
-        errorStore.handleFirebaseError(error, '讀取喝水目標')
+        errorStore.handleFirebaseError(error, t('ERROR.READ_TARGET'))
       },
     ),
   )
@@ -151,12 +154,10 @@ onMounted(() => {
       },
       (error) => {
         console.error('讀取今日喝水紀錄失敗:', error)
-        errorStore.handleFirebaseError(error, '讀取今日喝水紀錄')
+        errorStore.handleFirebaseError(error, t('ERROR.READ_TODAY'))
       },
     ),
   )
-
-  // 3. 監聽本周的喝水數據 -> 改由 weekly store 統一處理
   addSubscriber()
 })
 
@@ -258,7 +259,7 @@ const addWater = async (amount: number, event: Event) => {
       })
     } catch (error) {
       console.error('增加喝水紀錄失敗:', error)
-      errorStore.handleFirebaseError(error, '增加喝水紀錄')
+      errorStore.handleFirebaseError(error, t('ERROR.ADD_WATER'))
     }
   }
 

@@ -14,6 +14,6 @@ interface Props {
 }
 
 withDefaults(defineProps<Props>(), {
-  message: '載入中...'
+  message: ''
 })
 </script>

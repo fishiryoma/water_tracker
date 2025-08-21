@@ -1,0 +1,86 @@
+{
+  "MENU": {
+    "TARGET": "Goal",
+    "TRACKER": "Tracker",
+    "CALENDAR": "Calendar",
+    "LOGOUT": "Log Out"
+  },
+  "TITLE": {
+    "TARGET": "Water Intake Goal",
+    "STATISTICS": "Weekly Water Statistics"
+  },
+  "BUTTON": {
+    "SEND": "Submit",
+    "CHANGE": "Change Goal",
+    "CLEAR_ALL": "Clear All Notifications",
+    "LINK_LINE": "🔗 Link LINE Account"
+  },
+  "TRACKER": {
+    "SUBTITLE": "This Week’s Goal Achievement Chart",
+    "NOTE": "FYI: Coffee and tea don’t count as water",
+    "SUCCESS": "Achieved"
+  },
+  "CLENDER": {
+    "UNFINISHED": "Incomplete",
+    "FINISHED": "Completed",
+    "RATIO": "Monthly Completion Rate"
+  },
+  "STATISTICS": {
+    "Y_TIME": "Time of Intake",
+    "Y_TOTAL": "Total (L)",
+    "X_TIME": "Weekday",
+    "LINE": "Noon",
+    "HOUR": " o'clock"
+  },
+  "LOADING": {
+    "WEATHER": "Fetching Weather Data",
+    "DEFAULT": "Loading..."
+  },
+  "LOGIN": {
+    "SLOGAN": "Drink more water, stay healthy",
+    "LINE_NOTICE_TITLE": "Notice for users opening in LINE:",
+    "LINE_NOTICE_STEP1": "Tap the “⋯” menu in the corner",
+    "LINE_NOTICE_STEP2": "Select “Open in Browser”",
+    "LINE_NOTICE_STEP3": "Complete login in an external browser",
+    "FEATURE_REMINDER_TITLE": "Daily Water Reminder",
+    "FEATURE_REMINDER_DESC": "Receive customized reminders based on your preferences"
+  },
+  "PLACEHOLDER": {
+    "TARGET": "e.g., 2000",
+    "WATER_INTAKE": "e.g., 250"
+  },
+  "SUCCESS": {
+    "TARGET_UPDATED": "✅ Goal Updated Successfully"
+  },
+  "ERROR": {
+    "MONTH": "Load monthly data",
+    "TODAY": "Listen to today’s data",
+    "READ_TARGET": "Read water intake goal",
+    "READ_TODAY": "Read today’s data",
+    "ADD_WATER": "Add water intake record",
+    "INVALID_TARGET": "Please enter a valid goal value",
+    "SAVE_TARGET": "Save water intake goal",
+    "UPDATE_TODAY_RECORD": "Update today’s water intake record",
+    "LOGOUT_FAILED_TITLE": "Log Out Failed",
+    "LOGOUT_FAILED_DETAILS": "Please try logging out again",
+    "UPDATE_USER_DATA": "Update user data",
+    "WEEKLY_LISTENER": "Listen to weekly data",
+    "LIFF_INIT": "LIFF Initialization",
+    "FIREBASE_LOGIN": "Firebase Login",
+    "USER_LOGIN": "User Login",
+    "AUTO_LOGIN": "Auto Login"
+  },
+  "WEEKDAYS_SHORT": [
+    "Sun",
+    "Mon",
+    "Tue",
+    "Wed",
+    "Thu",
+    "Fri",
+    "Sat"
+  ],
+  "CHART": {
+    "BUBBLE_LABEL": "Single Intake",
+    "BAR_LABEL": "Daily Total"
+  }
+}

@@ -60,7 +60,7 @@
           @click="errorStore.clearAllErrors()"
           class="text-xs text-gray-500 hover:text-gray-700 hover:bg-white hover:rounded-xl hover:px-2 hover:py-1 cursor-pointer"
         >
-          清除所有通知
+          {{ t('BUTTON.CLEAR_ALL') }}
         </button>
       </div>
     </div>
@@ -114,7 +114,7 @@ const getIcon = (type: GlobalError['type']) => {
 }
 
 const formatTime = (timestamp: Date) => {
-  return timestamp.toLocaleTimeString('zh-TW', {
+  return timestamp.toLocaleTimeString(locale.value, {
     hour: '2-digit',
     minute: '2-digit'
   })

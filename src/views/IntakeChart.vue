@@ -1,5 +1,5 @@
 <template>
-  <h1 class="sm:text-3xl text-xl font-bold text-gray-800">一週喝水統計</h1>
+  <h1 class="sm:text-3xl text-xl font-bold text-gray-800">{{ $t('TITLE.STATISTICS') }}</h1>
   <WaterIntakeBubble :bubblePoints="bubblePoints" />
 </template>
 

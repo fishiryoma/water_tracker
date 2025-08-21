@@ -1,0 +1,86 @@
+{
+  "MENU": {
+    "TARGET": "目標を変更",
+    "TRACKER": "今日の飲水量",
+    "CALENDAR": "達成カレンダー",
+    "LOGOUT": "ログアウト"
+  },
+  "TITLE": {
+    "TARGET": "目標の飲水量",
+    "STATISTICS": "1週間の飲水統計"
+  },
+  "BUTTON": {
+    "SEND": "送信",
+    "CHANGE": "目標を変更",
+    "CLEAR_ALL": "すべての通知を消去",
+    "LINK_LINE": "🔗 LINEアカウントを連携"
+  },
+  "TRACKER": {
+    "SUBTITLE": "今週の目標達成表",
+    "NOTE": "※コーヒーやお茶は水に含まれません",
+    "SUCCESS": "クリア"
+  },
+  "CLENDER": {
+    "UNFINISHED": "未達成",
+    "FINISHED": "達成済み",
+    "RATIO": "今月の達成率"
+  },
+  "STATISTICS": {
+    "Y_TIME": "飲水時間",
+    "Y_TOTAL": "総量 (L)",
+    "X_TIME": "今週の日付",
+    "LINE": "正午",
+    "HOUR": "時"
+  },
+  "LOADING": {
+    "WEATHER": "天気情報を取得中",
+    "DEFAULT": "読み込み中..."
+  },
+  "LOGIN": {
+    "SLOGAN": "元気のために水を飲もう",
+    "LINE_NOTICE_TITLE": "LINEで開いている方への注意：",
+    "LINE_NOTICE_STEP1": "画面右上/下の「⋯」メニューをタップしてください",
+    "LINE_NOTICE_STEP2": "「ブラウザで開く」を選択してください",
+    "LINE_NOTICE_STEP3": "外部ブラウザでログインを完了してください",
+    "FEATURE_REMINDER_TITLE": "毎日の飲水リマインダー",
+    "FEATURE_REMINDER_DESC": "お好みに合わせたカスタマイズ通知を送信します"
+  },
+  "PLACEHOLDER": {
+    "TARGET": "例: 2000",
+    "WATER_INTAKE": "例: 250"
+  },
+  "SUCCESS": {
+    "TARGET_UPDATED": "✅目標が更新されました"
+  },
+  "ERROR": {
+    "MONTH": "月間データの読み込み",
+    "TODAY": "本日のデータを監視",
+    "READ_TARGET": "飲水目標の読み込み",
+    "READ_TODAY": "今日のデータを読み込み",
+    "ADD_WATER": "飲水記録を追加",
+    "INVALID_TARGET": "有効な目標値を入力してください",
+    "SAVE_TARGET": "飲水目標を保存",
+    "UPDATE_TODAY_RECORD": "今日の飲水記録を更新",
+    "LOGOUT_FAILED_TITLE": "ログアウトに失敗しました",
+    "LOGOUT_FAILED_DETAILS": "もう一度ログアウトをお試しください",
+    "UPDATE_USER_DATA": "ユーザーデータを更新",
+    "WEEKLY_LISTENER": "週間データを監視",
+    "LIFF_INIT": "LIFF初期化",
+    "FIREBASE_LOGIN": "Firebaseログイン",
+    "USER_LOGIN": "ユーザーログイン",
+    "AUTO_LOGIN": "自動ログイン"
+  },
+  "WEEKDAYS_SHORT": [
+    "日",
+    "月",
+    "火",
+    "水",
+    "木",
+    "金",
+    "土"
+  ],
+  "CHART": {
+    "BUBBLE_LABEL": "1回の飲水量",
+    "BAR_LABEL": "1日の総量"
+  }
+}

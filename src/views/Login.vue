@@ -6,26 +6,26 @@
       LINE
     </div>
     <h1 class="sm:text-2xl md:text-3xl text-md font-semibold text-gray-800">
-      多喝水沒事沒事多喝水
+      {{ t('LOGIN.SLOGAN') }}
     </h1>
 
     <div v-if="loading" class="mt-6">
       <div
         class="animate-spin border-4 border-gray-200 border-t-4 border-t-green-500 rounded-full w-8 h-8 mx-auto mb-2"
       ></div>
-      <p class="text-gray-600">載入中</p>
+      <p class="text-gray-600">{{ t('LOADING.DEFAULT') }}</p>
     </div>
-
+    <!-- v-if="isInLineApp() && !loading" -->
     <!-- 在 LINE 內建瀏覽器的特殊提示 -->
-    <div v-if="isInLineApp() && !loading" class="text-primary-700 sm:p-4 p-2 rounded-lg mb-4">
+    <div  class="text-primary-700 sm:p-4 p-2 rounded-lg mb-4">
       <div class="flex items-start">
         <div class="mr-3">📱</div>
         <div>
-          <strong class="block mb-2">在 LINE 中開啟的用戶請注意：</strong>
-          <ol class="text-sm space-y-1 list-decimal list-inside">
-            <li>請點擊角落的「⋯」選單</li>
-            <li>選擇「在瀏覽器中開啟」</li>
-            <li>在外部瀏覽器中完成登入</li>
+          <strong class="block mb-2">{{ t('LOGIN.LINE_NOTICE_TITLE') }}</strong>
+          <ol class="text-sm space-y-1 list-decimal ">
+            <li>{{ t('LOGIN.LINE_NOTICE_STEP1') }}</li>
+            <li>{{ t('LOGIN.LINE_NOTICE_STEP2') }}</li>
+            <li>{{ t('LOGIN.LINE_NOTICE_STEP3') }}</li>
           </ol>
         </div>
       </div>
@@ -40,8 +40,8 @@
             🔔
           </div>
           <div>
-            <strong class="block">每日喝水提醒</strong>
-            <small class="text-gray-600">根據您的偏好發送客製化內容</small>
+            <strong class="block">{{ t('LOGIN.FEATURE_REMINDER_TITLE') }}</strong>
+            <small class="text-gray-600">{{ t('LOGIN.FEATURE_REMINDER_DESC') }}</small>
           </div>
         </div>
       </div>
@@ -51,7 +51,7 @@
         @click="handleLineLogin"
         :disabled="loading"
       >
-        🔗 連結 LINE 帳戶
+        {{ t('BUTTON.LINK_LINE') }}
       </button>
     </div>
   </div>
@@ -66,6 +66,7 @@ import { OAuthProvider, signInWithCredential } from 'firebase/auth'
 import type { User } from 'firebase/auth'
 import { updateUserData } from '@/hooks/useUpdateUser'
 import { useGlobalErrorStore } from '@/stores/globalError'
+import { useI18n } from 'vue-i18n'
 
 import liff from '@line/liff'
 
@@ -73,6 +74,7 @@ const currentUser = ref<User | null>(null)
 const loading = ref(false)
 const router = useRouter()
 const errorStore = useGlobalErrorStore()
+const { t } = useI18n()
 
 // 初始化 LIFF
 let liffReady = false
@@ -193,7 +195,7 @@ const checkLoginStatus = async () => {
           router.push('/tracker')
         } catch (error) {
           console.error('自動登入失敗:', error)
-          errorStore.handleNetworkError(error, '自動登入')
+          errorStore.handleNetworkError(error, t('ERROR.AUTO_LOGIN'))
         }
       }
     }

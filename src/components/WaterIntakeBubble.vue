@@ -22,6 +22,9 @@ import { Chart } from 'vue-chartjs'
 import type { ChartData, ChartOptions } from 'chart.js'
 import 'chartjs-adapter-date-fns'
 import annotationPlugin from 'chartjs-plugin-annotation'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 ChartJS.register(
   Title,
@@ -66,7 +69,7 @@ const dailyTotals = computed(() => {
 const chartData = computed<ChartData<'bubble' | 'bar'>>(() => {
   const bubbleDataset = {
     type: 'bubble' as const,
-    label: '單次飲水',
+    label: t('CHART.BUBBLE_LABEL'),
     data: props.bubblePoints as any,
     backgroundColor: (ctx: any) => {
       const chart = ctx.chart
@@ -82,7 +85,7 @@ const chartData = computed<ChartData<'bubble' | 'bar'>>(() => {
 
   const barDataset = {
     type: 'bar' as const,
-    label: '每日總量',
+    label: t('CHART.BAR_LABEL'),
     data: dailyTotals.value,
     backgroundColor: 'rgba(13, 148, 136, 0.4)',
     yAxisID: 'y1',
@@ -113,11 +116,11 @@ const chartOptions = computed<ChartOptions<'bubble' | 'bar'>>(() => {
             day: 'MM/dd',
           },
         },
-        title: { display: true, text: '本週日期' },
+        title: { display: true, text: t('STATISTICS.X_TIME') },
         grid: { color: '#eee' },
       },
       y: {
-        title: { display: true, text: '喝水時間' },
+        title: { display: true, text: t('STATISTICS.Y_TIME') },
         min: 0,
         max: 23,
         reverse: true,
@@ -141,7 +144,7 @@ const chartOptions = computed<ChartOptions<'bubble' | 'bar'>>(() => {
             borderDash: [6, 6],
             label: {
               display: true,
-              content: '中午',
+              content: t('STATISTICS.LINE'),
               position: 'start',
               backgroundColor: 'transparent',
               color: '#475569',
@@ -156,7 +159,7 @@ const chartOptions = computed<ChartOptions<'bubble' | 'bar'>>(() => {
           label: (ctx: any) => {
             if (ctx.dataset.type === 'bubble') {
               const { ml, y } = ctx.raw as any
-              return `${y}點 - ${ml} mL`
+              return `${y}${t('STATISTICS.HOUR')} - ${ml} mL`
             }
             if (ctx.dataset.type === 'bar') {
               const { y } = ctx.raw as any
@@ -178,10 +181,10 @@ const chartOptions = computed<ChartOptions<'bubble' | 'bar'>>(() => {
       position: 'right',
       title: {
         display: true,
-        text: '總量 (L)',
+        text: t('STATISTICS.Y_TOTAL'),
       },
       ticks: {
-        callback: (value) => (Number(value) / 1000).toFixed(1), // 去掉千分位
+        callback: (value) => (Number(value) / 1000).toFixed(1),
       },
 
       grid: {
