@@ -72,11 +72,22 @@ export const useWeeklyStore = defineStore('weekly', () => {
     if (subscribers.value === 0) stop()
   })
 
+  function getRecordsForWeek(date: Date | string) {
+    const dateString = typeof date === 'string' ? date : date.toISOString().slice(0, 10)
+    const weekDates = getWeekDates(true, dateString)
+    const weekRecords: Record<string, DailyRecord> = {}
+    for (const d of weekDates) {
+      weekRecords[d] = records.value[d] || {}
+    }
+    return weekRecords
+  }
+
   return {
     records,
     subscribed,
     weeklyDrank,
     addSubscriber,
     removeSubscriber,
+    getRecordsForWeek,
   }
 })

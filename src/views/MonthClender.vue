@@ -20,7 +20,7 @@
         <div>已完成</div>
       </div>
     </div>
-    <div>完成率: {{ Math.round((completedDaysCount / attributes.length) * 100) || 0 }}%</div>
+    <div>本月完成率: {{ Math.round((completedDaysCount / attributes.length) * 100) || 0 }}%</div>
   </div>
 </template>
 

@@ -8,13 +8,11 @@ import WaterIntakeBubble from '@/components/WaterIntakeBubble.vue'
 import { useRoute } from 'vue-router'
 import { ref, watchEffect, computed, onUnmounted } from 'vue'
 import { useWeeklyStore } from '@/stores/weekly'
-import { storeToRefs } from 'pinia'
 import { getWeekDates } from '@/utils'
 
 const route = useRoute()
 const displayDate = ref<string | null>(null)
-const { weeklyDrank } = storeToRefs(useWeeklyStore())
-const { addSubscriber, removeSubscriber } = useWeeklyStore()
+const { addSubscriber, removeSubscriber, getRecordsForWeek } = useWeeklyStore()
 
 watchEffect(() => {
   removeSubscriber()
@@ -36,7 +34,7 @@ const bubblePoints = computed(() => {
   const points: { x: string; y: number; r: number; ml: number }[] = []
 
   getWeekDates(true, displayDate.value).forEach((date) => {
-    const record = weeklyDrank.value?.[date]
+    const record = getRecordsForWeek(displayDate.value)?.[date]
     const logs = record?.logs ?? {}
 
     // 如果沒有資料，仍保留一個隱形點（r=0）
