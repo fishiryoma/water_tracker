@@ -1,20 +1,17 @@
+import dayjs from 'dayjs'
+
 /**
- * 格式化日期為台灣時區
+ * 格式化日期為使用者時區
  */
-export const formatDateToTaiwan = (date: Date): string => {
-  const formatter = new Intl.DateTimeFormat('zh-TW', {
-    timeZone: 'Asia/Taipei',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  })
+export const formatDateToUserTimeZone = (date: Date): string => {
+  // 1. 取得使用者的精確時區
+  const userTimeZone = dayjs.tz.guess()
 
-  const parts = formatter.formatToParts(date)
-  const year = parts.find((p) => p.type === 'year')?.value
-  const month = parts.find((p) => p.type === 'month')?.value
-  const day = parts.find((p) => p.type === 'day')?.value
+  // 2. 將輸入的日期物件轉換為該時區的時間
+  const localTime = dayjs(date).tz(userTimeZone)
 
-  return `${year}-${month}-${day}`
+  // 3. 以 YYYY-MM-DD 的格式輸出
+  return localTime.format('YYYY-MM-DD')
 }
 
 /**
@@ -53,7 +50,7 @@ export const weekStatus = (
 export const generateMonthDates = (year: number, month: number): string[] => {
   const daysInMonth = new Date(year, month, 0).getDate() // month 是 1~12
   const today = new Date()
-  const todayStr = formatDateToTaiwan(today)
+  const todayStr = formatDateToUserTimeZone(today)
   const dates: string[] = []
 
   for (let day = 1; day <= daysInMonth; day++) {

@@ -1,5 +1,4 @@
 import './assets/main.css'
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { database } from './firebase'
 
 import { createApp } from 'vue'
@@ -10,6 +9,9 @@ import i18n from './i18n'
 import { useTheme } from './hooks/useTheme'
 import VCalendar from 'v-calendar'
 import 'v-calendar/style.css'
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
+import timezone from 'dayjs/plugin/timezone'
 
 useTheme()
 const app = createApp(App)
@@ -18,6 +20,9 @@ app.use(createPinia())
 app.use(router)
 app.use(i18n)
 app.use(VCalendar, {})
+
+dayjs.extend(utc)
+dayjs.extend(timezone)
 
 // 全局錯誤處理
 app.config.errorHandler = (err, instance, info) => {

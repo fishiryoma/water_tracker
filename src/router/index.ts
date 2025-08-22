@@ -6,6 +6,7 @@ import { updateUserData } from '@/hooks/useUpdateUser'
 import type { User } from 'firebase/auth'
 import { onAuthStateChanged } from 'firebase/auth'
 
+
 const getCurrentUser = () => {
   return new Promise((resolve, reject) => {
     const removeListener = onAuthStateChanged(
@@ -36,9 +37,9 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
-      path: '/clender',
-      name: 'clender',
-      component: () => import('@/views/MonthClender.vue'),
+      path: '/calendar',
+      name: 'calendar',
+      component: () => import('@/views/MonthCalendar.vue'),
       meta: { requiresAuth: true },
     },
     {

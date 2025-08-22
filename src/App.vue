@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
-import { onUnmounted, computed } from 'vue'
+import { onUnmounted, computed, watch } from 'vue'
 import BackgroundContainer from '@/components/BackgroundContainer.vue'
 import Container from '@/components/Container.vue'
 import GlobalErrorHandler from '@/components/GlobalErrorHandler.vue'
@@ -76,6 +76,16 @@ const setLocale = (selectedLocale: string) => {
   locale.value = selectedLocale
   localStorage.setItem('user-locale', selectedLocale)
 }
+
+watch(
+  locale,
+  (newLocale) => {
+    // 將 html 的 lang 屬性設定為新的語系
+    document.documentElement.lang = newLocale
+    document.title = t('TITLE.APP_NAME')
+  },
+  { immediate: true },
+)
 </script>
 
 <template>

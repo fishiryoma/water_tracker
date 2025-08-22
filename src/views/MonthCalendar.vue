@@ -1,15 +1,7 @@
 <template>
   <div class="w-full flex flex-col gap-2">
-    <div v-if="isLoading" class="flex items-center justify-center w-full h-[400px]">
-      <LoadingSpinner
-        :show="true"
-        spinClass="w-10 h-10"
-        textClass="text-lg"
-        :message="$t('LOADING.DEFAULT')"
-        layout="vertical"
-      />
-    </div>
-    <template v-else>
+    <PageLoading :isLoading="isLoading" />
+    <template v-if="!isLoading">
       <VCalendar
         min-date="2025-01-01"
         max-date="2025-12-31"
@@ -23,18 +15,19 @@
       <div class="flex justify-center gap-2">
         <div class="flex items-center gap-2">
           <div class="w-4 h-4 rounded-full bg-[#FF5A79]"></div>
-          <div>{{ $t('CLENDER.UNFINISHED') }}</div>
+          <div>{{ $t('CALENDAR.UNFINISHED') }}</div>
         </div>
         <div class="flex items-center gap-2">
           <div class="w-4 h-4 rounded-full bg-[#699F4C]"></div>
-          <div>{{ $t('CLENDER.FINISHED') }}</div>
+          <div>{{ $t('CALENDAR.FINISHED') }}</div>
         </div>
       </div>
       <div>
-        {{ $t('CLENDER.RATIO') }}：{{
+        {{ $t('CALENDAR.RATIO') }}：{{
           Math.round((completedDaysCount / attributes.length) * 100) || 0
         }}%
       </div>
+      <div class="text-center text-xs text-gray-500">{{ `＜ ${t('CALENDAR.MORE')} ＞` }}</div>
     </template>
   </div>
 </template>
@@ -47,9 +40,9 @@ import { ref, onMounted, onUnmounted, watch, computed, nextTick } from 'vue'
 import { useUserIdStore } from '@/stores/userId'
 import { storeToRefs } from 'pinia'
 import { useGlobalErrorStore } from '@/stores/globalError'
-import { formatDateToTaiwan, generateMonthDates } from '@/utils'
+import { formatDateToUserTimeZone, generateMonthDates } from '@/utils'
 import { useI18n } from 'vue-i18n'
-import LoadingSpinner from '@/components/LoadingSpinner.vue'
+import PageLoading from '@/components/PageLoading.vue'
 
 const router = useRouter()
 
@@ -61,7 +54,7 @@ const _red = '#FF5A79'
 const _green = '#699F4C'
 
 const isLoading = ref(true)
-const todayDate = ref<string>(formatDateToTaiwan(new Date()))
+const todayDate = ref<string>(formatDateToUserTimeZone(new Date()))
 const queryRef = ref<{ month: number; year: number }>({
   month: new Date().getMonth() + 1,
   year: new Date().getFullYear(),

@@ -1,14 +1,6 @@
 <template>
-  <LoadingSpinner
-    class="flex items-center justify-center w-full h-[400px]"
-    v-if="isLoading"
-    :show="true"
-    spinClass="w-10 h-10"
-    textClass="text-lg"
-    :message="$t('LOADING.DEFAULT')"
-    layout="vertical"
-  />
-  <template v-else>
+  <PageLoading :isLoading="isLoading" />
+  <template v-if="!isLoading">
     <CircularProgress ref="circularProgressRef" :percentage="progressPercentage">
       <template #center>
         <div v-if="remainingWater > 0" class="flex flex-col items-center z-1 gap-1">
@@ -54,7 +46,9 @@
       </Button>
     </div>
 
-    <ClenderPanel :weeklyDrank="weekDates" />
+    <div @click="handleCalendarClick" class="cursor-pointer flex flex-col gap-2 mt-4">
+      <CalendarPanel :weeklyDrank="weekDates" />
+    </div>
 
     <p class="text-gray-400">{{ $t('TRACKER.NOTE') }}</p>
   </template>
@@ -63,7 +57,7 @@
 <script setup lang="ts">
 import Button from '@/components/Button.vue'
 import FormInput from '@/components/FormInput.vue'
-import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted, computed, nextTick } from 'vue'
 import { database } from '@/firebase'
 import { ref as dbRef, onValue, update } from 'firebase/database'
 import { useUserIdStore } from '@/stores/userId'
@@ -72,12 +66,16 @@ import { storeToRefs } from 'pinia'
 import { useWaterStore } from '@/stores/water'
 import { useWeeklyStore } from '@/stores/weekly'
 import CircularProgress from '@/components/CircularProgress.vue'
-import { formatDateToTaiwan, getWeekDates, weekStatus } from '@/utils'
-import ClenderPanel from '@/components/ClenderPanel.vue'
+import { formatDateToUserTimeZone, getWeekDates, weekStatus } from '@/utils'
+import CalendarPanel from '@/components/CalendarPanel.vue'
 import { gsap } from 'gsap'
 import { MotionPathPlugin } from 'gsap/MotionPathPlugin'
 import { useI18n } from 'vue-i18n'
-import LoadingSpinner from '@/components/LoadingSpinner.vue'
+import PageLoading from '@/components/PageLoading.vue'
+import dayjs from 'dayjs'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 const { t } = useI18n()
 
@@ -128,7 +126,7 @@ const waterOptions = [350, 500, 750]
 
 // 取得今天的日期 (YYYY-MM-DD 格式)
 const getTodayDate = (): string => {
-  return formatDateToTaiwan(new Date())
+  return formatDateToUserTimeZone(new Date())
 }
 
 onMounted(() => {
@@ -182,6 +180,15 @@ onMounted(() => {
   )
   addSubscriber()
 })
+
+const handleCalendarClick = () => {
+  const date = dayjs().format('YYYY-MM-DD')
+  nextTick()
+  router.push({
+    name: 'weekIntake',
+    params: { date },
+  })
+}
 
 onUnmounted(() => {
   unsubs.forEach((fn) => fn())

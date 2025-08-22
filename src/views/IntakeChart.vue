@@ -1,14 +1,6 @@
 <template>
-  <div v-if="isLoading" class="flex items-center justify-center w-full h-[400px]">
-    <LoadingSpinner
-      :show="true"
-      spinClass="w-10 h-10"
-      textClass="text-lg"
-      :message="$t('LOADING.DEFAULT')"
-      layout="vertical"
-    />
-  </div>
-  <template v-else>
+  <PageLoading :isLoading="isLoading" />
+  <template v-if="!isLoading">
     <h1 class="sm:text-3xl text-xl font-bold text-gray-800">{{ $t('TITLE.STATISTICS') }}</h1>
     <WaterIntakeBubble :bubblePoints="bubblePoints" />
   </template>
@@ -21,7 +13,8 @@ import { ref, watchEffect, computed, onUnmounted } from 'vue'
 import { useWeeklyStore } from '@/stores/weekly'
 import { getWeekDates } from '@/utils'
 import { storeToRefs } from 'pinia'
-import LoadingSpinner from '@/components/LoadingSpinner.vue'
+import PageLoading from '@/components/PageLoading.vue'
+import dayjs from 'dayjs'
 
 const route = useRoute()
 const displayDate = ref<string | null>(null)
@@ -47,6 +40,7 @@ onUnmounted(() => {
 
 const bubblePoints = computed(() => {
   const points: { x: string; y: number; r: number; ml: number }[] = []
+  const userTimeZone = dayjs.tz.guess()
 
   getWeekDates(true, displayDate.value).forEach((date) => {
     const record = getRecordsForWeek(displayDate.value)?.[date]
@@ -60,7 +54,9 @@ const bubblePoints = computed(() => {
         const timestamp = Number(timestampStr)
         const ml = Number(mlRaw)
         if (!isNaN(timestamp) && !isNaN(ml)) {
-          const hour = new Date(timestamp).getHours()
+          // 將時間戳轉換為使用者時區
+          const localDayjsObject = dayjs(timestamp).tz(userTimeZone)
+          const hour = localDayjsObject.hour()
           const radius = Math.min(20, Math.ceil(ml / 30))
           points.push({ x: date, y: hour, r: radius, ml })
         }

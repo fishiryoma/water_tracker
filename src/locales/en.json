@@ -6,12 +6,14 @@
     "LOGOUT": "Log Out"
   },
   "TITLE": {
-    "TARGET": "Water Intake Goal",
+    "APP_NAME": "WATER",
+    "TARGET": "Water Intake Goal(mL)",
     "STATISTICS": "Weekly Water Statistics"
   },
   "BUTTON": {
     "SEND": "Submit",
     "CHANGE": "Change Goal",
+    "RESET": "Reset",
     "CLEAR_ALL": "Clear All Notifications",
     "LINK_LINE": "🔗 Link LINE Account"
   },
@@ -20,10 +22,11 @@
     "NOTE": "FYI: Coffee and tea don’t count as water",
     "SUCCESS": "Achieved"
   },
-  "CLENDER": {
+  "CALENDAR": {
     "UNFINISHED": "Incomplete",
     "FINISHED": "Completed",
-    "RATIO": "Monthly Completion Rate"
+    "RATIO": "Monthly Completion Rate",
+    "MORE": "Click to view details"
   },
   "STATISTICS": {
     "Y_TIME": "Time of Intake",
@@ -68,7 +71,8 @@
     "LIFF_INIT": "LIFF Initialization",
     "FIREBASE_LOGIN": "Firebase Login",
     "USER_LOGIN": "User Login",
-    "AUTO_LOGIN": "Auto Login"
+    "AUTO_LOGIN": "Auto Login",
+    "TARGET_SAME": "Target has not changed"
   },
   "WEEKDAYS_SHORT": [
     "Sun",

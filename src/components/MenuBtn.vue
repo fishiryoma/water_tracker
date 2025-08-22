@@ -11,7 +11,7 @@
       >
         <div
           :class="[
-            'flex flex-col items-center justify-center p-1 sm:p-2 hover:opacity-80 cursor-pointer duration-200',
+            'flex flex-col items-center justify-center p-1 sm:p-2 hover:opacity-70 cursor-pointer duration-200',
             isActive ? 'text-primary-600' : 'text-gray-600',
           ]"
         >
@@ -54,6 +54,6 @@ const props = defineProps({
 const menu = computed(() => [
   { url: '/target', icon: ChartBarSquareIcon, text: t('MENU.TARGET') },
   { url: '/tracker', icon: ChatBubbleOvalLeftIcon, text: t('MENU.TRACKER') },
-  { url: '/clender', icon: CalendarIcon, text: t('MENU.CALENDAR') },
+  { url: '/calendar', icon: CalendarIcon, text: t('MENU.CALENDAR') },
 ])
 </script>

@@ -6,12 +6,14 @@
     "LOGOUT": "ログアウト"
   },
   "TITLE": {
-    "TARGET": "目標の飲水量",
+    "APP_NAME": "水を飲もう",
+    "TARGET": "目標の飲水量(mL)",
     "STATISTICS": "1週間の飲水統計"
   },
   "BUTTON": {
     "SEND": "送信",
     "CHANGE": "目標を変更",
+    "RESET": "リセット",
     "CLEAR_ALL": "すべての通知を消去",
     "LINK_LINE": "🔗 LINEアカウントを連携"
   },
@@ -20,10 +22,11 @@
     "NOTE": "※コーヒーやお茶は水に含まれません",
     "SUCCESS": "クリア"
   },
-  "CLENDER": {
+  "CALENDAR": {
     "UNFINISHED": "未達成",
     "FINISHED": "達成済み",
-    "RATIO": "今月の達成率"
+    "RATIO": "今月の達成率",
+    "MORE": "クリックして詳細を表示"
   },
   "STATISTICS": {
     "Y_TIME": "飲水時間",
@@ -68,7 +71,8 @@
     "LIFF_INIT": "LIFF初期化",
     "FIREBASE_LOGIN": "Firebaseログイン",
     "USER_LOGIN": "ユーザーログイン",
-    "AUTO_LOGIN": "自動ログイン"
+    "AUTO_LOGIN": "自動ログイン",
+    "TARGET_SAME": "目標が変更されていません"
   },
   "WEEKDAYS_SHORT": [
     "日",

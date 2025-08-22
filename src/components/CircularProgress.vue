@@ -277,6 +277,7 @@ watch(
     const intensity = Math.min(1.5, 0.5 + (delta / 100) * 1.2)
     exciteWaves(intensity)
   },
+  { immediate: true }
 )
 
 defineExpose({ rootEl, exciteWaves })

@@ -1,5 +1,5 @@
 <template>
-  <p class="mt-4 text-primary-800">{{ $t('TRACKER.SUBTITLE') }} </p>
+  <p class="text-primary-800">{{ $t('TRACKER.SUBTITLE') }}</p>
   <div ref="gridRef" class="grid grid-cols-7 border-2 border-primary-800/50 rounded-lg px-3">
     <ClenderDay v-for="day in weekdayTw" :key="day" className="border-b-2 border-primary-800/50">
       {{ day }}
@@ -21,7 +21,7 @@
 
 <script setup lang="ts">
 import { computed, ref, watch, nextTick } from 'vue'
-import ClenderDay from './ClenderDay.vue'
+import ClenderDay from './CalendarDay.vue'
 import { MinusIcon } from '@heroicons/vue/24/outline'
 import { StarIcon } from '@heroicons/vue/24/solid'
 import { gsap } from 'gsap'
@@ -32,7 +32,7 @@ const { tm } = useI18n()
 const weekdayTw = computed(() => tm('WEEKDAYS_SHORT'))
 
 const props = defineProps<{
-  weeklyDrank: Record<string, { finished: boolean; status: string; }>
+  weeklyDrank: Record<string, { finished: boolean; status: string }>
 }>()
 const gridRef = ref<HTMLDivElement | null>(null)
 
