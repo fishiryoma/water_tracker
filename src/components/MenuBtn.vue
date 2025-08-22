@@ -34,7 +34,7 @@
 
 <script setup lang="ts">
 import { RouterLink } from 'vue-router'
-import { type PropType } from 'vue'
+import { type PropType, computed } from 'vue'
 import { ChartBarSquareIcon } from '@heroicons/vue/24/outline'
 import { ChatBubbleOvalLeftIcon } from '@heroicons/vue/24/outline'
 import { ArrowTopRightOnSquareIcon } from '@heroicons/vue/24/outline'
@@ -51,9 +51,9 @@ const props = defineProps({
   },
 })
 
-const menu = [
+const menu = computed(() => [
   { url: '/target', icon: ChartBarSquareIcon, text: t('MENU.TARGET') },
   { url: '/tracker', icon: ChatBubbleOvalLeftIcon, text: t('MENU.TRACKER') },
   { url: '/clender', icon: CalendarIcon, text: t('MENU.CALENDAR') },
-]
+])
 </script>

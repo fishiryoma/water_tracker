@@ -1,6 +1,17 @@
 <template>
-  <h1 class="sm:text-3xl text-xl font-bold text-gray-800">{{ $t('TITLE.STATISTICS') }}</h1>
-  <WaterIntakeBubble :bubblePoints="bubblePoints" />
+  <div v-if="isLoading" class="flex items-center justify-center w-full h-[400px]">
+    <LoadingSpinner
+      :show="true"
+      spinClass="w-10 h-10"
+      textClass="text-lg"
+      :message="$t('LOADING.DEFAULT')"
+      layout="vertical"
+    />
+  </div>
+  <template v-else>
+    <h1 class="sm:text-3xl text-xl font-bold text-gray-800">{{ $t('TITLE.STATISTICS') }}</h1>
+    <WaterIntakeBubble :bubblePoints="bubblePoints" />
+  </template>
 </template>
 
 <script setup lang="ts">
@@ -9,10 +20,14 @@ import { useRoute } from 'vue-router'
 import { ref, watchEffect, computed, onUnmounted } from 'vue'
 import { useWeeklyStore } from '@/stores/weekly'
 import { getWeekDates } from '@/utils'
+import { storeToRefs } from 'pinia'
+import LoadingSpinner from '@/components/LoadingSpinner.vue'
 
 const route = useRoute()
 const displayDate = ref<string | null>(null)
-const { addSubscriber, removeSubscriber, getRecordsForWeek } = useWeeklyStore()
+const weeklyStore = useWeeklyStore()
+const { addSubscriber, removeSubscriber, getRecordsForWeek } = weeklyStore
+const { isLoading } = storeToRefs(weeklyStore)
 
 watchEffect(() => {
   removeSubscriber()

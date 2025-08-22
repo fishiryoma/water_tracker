@@ -25,7 +25,7 @@ export const useWaterStore = defineStore('water', () => {
     },
     (error) => {
       console.error('讀取喝水目標失敗:', error)
-      errorStore.handleFirebaseError(error, i18n.global.t('ERROR.READ_TARGET'))
+      errorStore.handleFirebaseError(error, '讀取喝水目標失敗')
     },
   )
 

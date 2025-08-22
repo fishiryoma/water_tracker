@@ -1,26 +1,41 @@
 <template>
   <div class="w-full flex flex-col gap-2">
-    <VCalendar
-      min-date="2025-01-01"
-      max-date="2025-12-31"
-      expanded
-      borderless
-      transparent
-      :attributes="attributes"
-      @update:pages="handlePageUpdate"
-      @dayclick="handleDayClick"
-    />
-    <div class="flex justify-center gap-2">
-      <div class="flex items-center gap-2">
-        <div class="w-4 h-4 rounded-full bg-[#FF5A79]"></div>
-        <div>{{ $t('CLENDER.UNFINISHED') }}</div>
-      </div>
-      <div class="flex items-center gap-2">
-        <div class="w-4 h-4 rounded-full bg-[#699F4C]"></div>
-        <div>{{ $t('CLENDER.FINISHED') }}</div>
-      </div>
+    <div v-if="isLoading" class="flex items-center justify-center w-full h-[400px]">
+      <LoadingSpinner
+        :show="true"
+        spinClass="w-10 h-10"
+        textClass="text-lg"
+        :message="$t('LOADING.DEFAULT')"
+        layout="vertical"
+      />
     </div>
-    <div>{{ $t('CLENDER.RATIO') }}：{{ Math.round((completedDaysCount / attributes.length) * 100) || 0 }}%</div>
+    <template v-else>
+      <VCalendar
+        min-date="2025-01-01"
+        max-date="2025-12-31"
+        expanded
+        borderless
+        transparent
+        :attributes="attributes"
+        @update:pages="handlePageUpdate"
+        @dayclick="handleDayClick"
+      />
+      <div class="flex justify-center gap-2">
+        <div class="flex items-center gap-2">
+          <div class="w-4 h-4 rounded-full bg-[#FF5A79]"></div>
+          <div>{{ $t('CLENDER.UNFINISHED') }}</div>
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="w-4 h-4 rounded-full bg-[#699F4C]"></div>
+          <div>{{ $t('CLENDER.FINISHED') }}</div>
+        </div>
+      </div>
+      <div>
+        {{ $t('CLENDER.RATIO') }}：{{
+          Math.round((completedDaysCount / attributes.length) * 100) || 0
+        }}%
+      </div>
+    </template>
   </div>
 </template>
 
@@ -34,6 +49,7 @@ import { storeToRefs } from 'pinia'
 import { useGlobalErrorStore } from '@/stores/globalError'
 import { formatDateToTaiwan, generateMonthDates } from '@/utils'
 import { useI18n } from 'vue-i18n'
+import LoadingSpinner from '@/components/LoadingSpinner.vue'
 
 const router = useRouter()
 
@@ -44,6 +60,7 @@ const { t } = useI18n()
 const _red = '#FF5A79'
 const _green = '#699F4C'
 
+const isLoading = ref(true)
 const todayDate = ref<string>(formatDateToTaiwan(new Date()))
 const queryRef = ref<{ month: number; year: number }>({
   month: new Date().getMonth() + 1,
@@ -122,9 +139,11 @@ const completedDaysCount = computed(() => {
 
 // ========= 資料讀取 =========
 const loadMonthlyData = async () => {
+  isLoading.value = true
   const dates = allMonthDates.value
   if (dates.length === 0) {
     monthlyRecords.value = {}
+    isLoading.value = false
     return
   }
 
@@ -145,6 +164,8 @@ const loadMonthlyData = async () => {
   } catch (error) {
     console.error('讀取月份資料失敗:', error)
     errorStore.handleFirebaseError(error, t('ERROR.MONTH'))
+  } finally {
+    isLoading.value = false
   }
 }
 

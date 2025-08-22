@@ -5,7 +5,7 @@
       v-if="weatherStore.weather.isLoading"
       class="absolute top-4 left-1/2 transform -translate-x-1/2 z-10 bg-white/80 rounded-lg p-2 shadow-lg"
     >
-      <LoadingSpinner :show="true" :message="t('LOADING.WEATHER')" />
+      <LoadingSpinner :show="true" :message="$t('LOADING.WEATHER')" />
     </div>
     <slot></slot>
   </div>

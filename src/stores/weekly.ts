@@ -20,6 +20,9 @@ export const useWeeklyStore = defineStore('weekly', () => {
   const subscribed = ref(false)
   let unsubscribe: (() => void) | null = null
   const subscribers = ref(0)
+  const isInitialDataLoaded = ref(false)
+
+  const isLoading = computed(() => !isInitialDataLoaded.value)
 
   // 啟動單一 onValue 監聽，避免多處重複連線
   function start() {
@@ -31,10 +34,12 @@ export const useWeeklyStore = defineStore('weekly', () => {
       (snap) => {
         const data = (snap.val() || {}) as Record<string, DailyRecord>
         records.value = data || {}
+        isInitialDataLoaded.value = true
       },
       (err) => {
         console.error(' weekly 紀錄監聽失敗:', err)
         errorStore.handleFirebaseError(err, '監聽 weekly 資料')
+        isInitialDataLoaded.value = true // 發生錯誤時也標記為載入完成，避免無限載入
       },
     )
     subscribed.value = true
@@ -46,6 +51,7 @@ export const useWeeklyStore = defineStore('weekly', () => {
       unsubscribe = null
     }
     subscribed.value = false
+    isInitialDataLoaded.value = false // 停止監聽後，重置載入狀態
   }
 
   function addSubscriber() {
@@ -86,6 +92,7 @@ export const useWeeklyStore = defineStore('weekly', () => {
     records,
     subscribed,
     weeklyDrank,
+    isLoading,
     addSubscriber,
     removeSubscriber,
     getRecordsForWeek,

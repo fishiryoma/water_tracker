@@ -18,7 +18,7 @@ export const updateUserData = async (user: User) => {
       console.log('用戶資料更新成功')
     } catch (error) {
       console.error('更新用戶資料失敗:', error)
-      errorStore.handleFirebaseError(error, i18n.global.t('ERROR.UPDATE_USER_DATA'))
+      errorStore.handleFirebaseError(error, '更新用戶資料')
       throw error // 保留拋出，因為上層需要知道更新失敗
     }
   }

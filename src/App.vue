@@ -16,7 +16,8 @@ import { auth } from '@/firebase'
 import { signOut } from 'firebase/auth'
 import { useI18n } from 'vue-i18n'
 import logoJp from '@/assets/logo_Jp.png'
-import logoT from '@/assets/logo_Tw.png'
+import logoTw from '@/assets/logo_Tw.png'
+import logoEn from '@/assets/logo_En.png'
 
 const { t, locale } = useI18n()
 
@@ -32,7 +33,9 @@ weatherStore.loadCachedWeather()
 weatherStore.fetchWeather()
 
 const logoSrc = computed(() => {
-  return locale.value === 'ja' ? logoJp : logoT
+  if (locale.value === 'ja') return logoJp
+  else if (locale.value === 'en') return logoEn
+  else return logoTw
 })
 
 // 定時檢查天氣資料是否需要更新
@@ -85,7 +88,12 @@ const setLocale = (selectedLocale: string) => {
           v-for="lang in lang"
           :key="lang.key"
           @click="setLocale(lang.key)"
-          class="cursor-pointer bg-white/70 rounded-xl px-1.5 py-1 hover:bg-gray-200 duration-200 text-stone-600 text-xs"
+          :class="[
+            'cursor-pointer rounded-xl px-1.5 py-1 duration-200 text-xs',
+            lang.key === locale
+              ? 'bg-gray-500/80 text-white'
+              : 'bg-white/70 text-stone-600 hover:bg-gray-200',
+          ]"
         >
           {{ lang.value }}
         </div>

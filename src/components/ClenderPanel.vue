@@ -172,17 +172,21 @@ const emphasizeLux = (iconEl: HTMLElement) => {
   return tl
 }
 
-watch(todayIsFinished, async (newVal, prevVal) => {
-  if (newVal && !prevVal) {
-    await nextTick()
-    const date = todayDateKey.value
-    if (!date) return
-    const iconEl = gridRef.value?.querySelector(
-      `[data-date="${date}"] [data-week-icon]`,
-    ) as HTMLElement | null
-    if (iconEl) {
-      emphasizeLux(iconEl)
+watch(
+  todayIsFinished,
+  async (isFinished) => {
+    if (isFinished) {
+      await nextTick()
+      const date = todayDateKey.value
+      if (!date) return
+      const iconEl = gridRef.value?.querySelector(
+        `[data-date="${date}"] [data-week-icon]`,
+      ) as HTMLElement | null
+      if (iconEl) {
+        emphasizeLux(iconEl)
+      }
     }
-  }
-})
+  },
+  { immediate: true },
+)
 </script>

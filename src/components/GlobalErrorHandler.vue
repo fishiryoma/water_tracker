@@ -1,15 +1,8 @@
 <template>
   <!-- 全局錯誤顯示 -->
   <Teleport to="body">
-    <div
-      v-if="errorStore.isVisible"
-      class="fixed top-4 right-4 z-50 max-w-sm space-y-2"
-    >
-      <TransitionGroup
-        name="error-slide"
-        tag="div"
-        class="space-y-2"
-      >
+    <div v-if="errorStore.isVisible" class="fixed top-4 right-4 z-50 max-w-sm space-y-2">
+      <TransitionGroup name="error-slide" tag="div" class="space-y-2">
         <div
           v-for="error in errorStore.errors"
           :key="error.id"
@@ -60,7 +53,7 @@
           @click="errorStore.clearAllErrors()"
           class="text-xs text-gray-500 hover:text-gray-700 hover:bg-white hover:rounded-xl hover:px-2 hover:py-1 cursor-pointer"
         >
-          {{ t('BUTTON.CLEAR_ALL') }}
+          {{ $t('BUTTON.CLEAR_ALL') }}
         </button>
       </div>
     </div>
@@ -69,12 +62,15 @@
 
 <script setup lang="ts">
 import { useGlobalErrorStore, type GlobalError } from '@/stores/globalError'
+import { useI18n } from 'vue-i18n'
+
+const { locale } = useI18n()
 
 const errorStore = useGlobalErrorStore()
 
 const getErrorClasses = (type: GlobalError['type']) => {
   const baseClasses = ''
-  
+
   switch (type) {
     case 'error':
       return `${baseClasses} bg-red-100/60 text-red-800`
@@ -116,7 +112,7 @@ const getIcon = (type: GlobalError['type']) => {
 const formatTime = (timestamp: Date) => {
   return timestamp.toLocaleTimeString(locale.value, {
     hour: '2-digit',
-    minute: '2-digit'
+    minute: '2-digit',
   })
 }
 

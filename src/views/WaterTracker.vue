@@ -1,50 +1,63 @@
 <template>
-  <CircularProgress ref="circularProgressRef" :percentage="progressPercentage">
-    <template #center>
-      <div v-if="remainingWater > 0" class="flex flex-col items-center z-1 gap-1">
-        <span class="text-2xl font-bold text-gray-800"> {{ progressPercentage.toFixed(0) }}% </span>
-        <span class="text-sm text-gray-800 font-bold">
-          {{ todayDrank }} / {{ dailyTarget }} ml
-        </span>
-      </div>
-      <div v-else class="flex flex-col items-center z-1 gap-2">
-        <div class="text-2xl font-bold text-sky-800 shiny-text">{{ $t('TRACKER.SUCCESS') }}</div>
-        <span class="text-sm text-sky-800 font-bold"> {{ todayDrank }} ml </span>
-      </div>
-    </template>
-  </CircularProgress>
+  <LoadingSpinner
+    class="flex items-center justify-center w-full h-[400px]"
+    v-if="isLoading"
+    :show="true"
+    spinClass="w-10 h-10"
+    textClass="text-lg"
+    :message="$t('LOADING.DEFAULT')"
+    layout="vertical"
+  />
+  <template v-else>
+    <CircularProgress ref="circularProgressRef" :percentage="progressPercentage">
+      <template #center>
+        <div v-if="remainingWater > 0" class="flex flex-col items-center z-1 gap-1">
+          <span class="text-2xl font-bold text-gray-800">
+            {{ progressPercentage.toFixed(0) }}%
+          </span>
+          <span class="text-sm text-gray-800 font-bold">
+            {{ todayDrank }} / {{ dailyTarget }} ml
+          </span>
+        </div>
+        <div v-else class="flex flex-col items-center z-1 gap-2">
+          <div class="text-2xl font-bold text-sky-800 shiny-text">{{ $t('TRACKER.SUCCESS') }}</div>
+          <span class="text-sm text-sky-800 font-bold"> {{ todayDrank }} ml </span>
+        </div>
+      </template>
+    </CircularProgress>
 
-  <div class="grid grid-cols-3 gap-2 w-full">
-    <Button
-      v-for="amount in waterOptions"
-      :key="amount"
-      @click="addWater(amount, $event)"
-      outerClass="w-full sm:w-full"
-    >
-      +{{ amount }}
-    </Button>
-  </div>
+    <div class="grid grid-cols-3 gap-2 w-full">
+      <Button
+        v-for="amount in waterOptions"
+        :key="amount"
+        @click="addWater(amount, $event)"
+        outerClass="w-full sm:w-full"
+      >
+        +{{ amount }}
+      </Button>
+    </div>
 
-  <div class="flex gap-4 items-center justify-center w-full">
-    <FormInput
-      type="number"
-      step="100"
-      min="0"
-      :max="dailyTarget - todayDrank"
-      :modelValue="inputDrank"
-      @update:modelValue="(val: number) => (inputDrank = val)"
-      :placeholder="t('PLACEHOLDER.WATER_INTAKE')"
-      inputmode="numeric"
-      pattern="[0-9]*"
-    />
-    <Button ref="cusButton" @click="(addWater(inputDrank, $event), (inputDrank = 0))">
-      {{ $t('BUTTON.SEND') }}
-    </Button>
-  </div>
+    <div class="flex gap-4 items-center justify-center w-full">
+      <FormInput
+        type="number"
+        step="100"
+        min="0"
+        :max="dailyTarget - todayDrank"
+        :modelValue="inputDrank"
+        @update:modelValue="(val: number) => (inputDrank = val)"
+        :placeholder="t('PLACEHOLDER.WATER_INTAKE')"
+        inputmode="numeric"
+        pattern="[0-9]*"
+      />
+      <Button ref="cusButton" @click="(addWater(inputDrank, $event), (inputDrank = 0))">
+        {{ $t('BUTTON.SEND') }}
+      </Button>
+    </div>
 
-  <ClenderPanel :weeklyDrank="weekDates" />
+    <ClenderPanel :weeklyDrank="weekDates" />
 
-  <p class="text-gray-400">{{ $t('TRACKER.NOTE') }}</p>
+    <p class="text-gray-400">{{ $t('TRACKER.NOTE') }}</p>
+  </template>
 </template>
 
 <script setup lang="ts">
@@ -64,6 +77,7 @@ import ClenderPanel from '@/components/ClenderPanel.vue'
 import { gsap } from 'gsap'
 import { MotionPathPlugin } from 'gsap/MotionPathPlugin'
 import { useI18n } from 'vue-i18n'
+import LoadingSpinner from '@/components/LoadingSpinner.vue'
 
 const { t } = useI18n()
 
@@ -81,8 +95,12 @@ const inputDrank = ref<number>(0) // input輸入喝水量
 const todayDate = ref<string>('') // 今日日期，格式為 YYYY-MM-DD
 const unsubs: Array<() => void> = [] // Firebase 監聽取消函式收集
 const circularProgressRef = ref<InstanceType<typeof CircularProgress> | null>(null)
+const isTargetLoading = ref(true)
+const isDrankLoading = ref(true)
 
 // 計算屬性
+const isLoading = computed(() => isTargetLoading.value || isDrankLoading.value)
+
 const remainingWater = computed<number>(() => {
   return Math.max(0, dailyTarget.value - todayDrank.value)
 })
@@ -128,10 +146,12 @@ onMounted(() => {
         } else {
           dailyTarget.value = 0
         }
+        isTargetLoading.value = false
       },
       (error) => {
         console.error('讀取喝水目標失敗:', error)
         errorStore.handleFirebaseError(error, t('ERROR.READ_TARGET'))
+        isTargetLoading.value = false
       },
     ),
   )
@@ -151,10 +171,12 @@ onMounted(() => {
         } else {
           todayDrank.value = 0 // 如果今天還沒有紀錄，則為 0
         }
+        isDrankLoading.value = false
       },
       (error) => {
         console.error('讀取今日喝水紀錄失敗:', error)
         errorStore.handleFirebaseError(error, t('ERROR.READ_TODAY'))
+        isDrankLoading.value = false
       },
     ),
   )

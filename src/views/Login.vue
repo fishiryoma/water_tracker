@@ -60,7 +60,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-
 import { auth } from '@/firebase'
 import { OAuthProvider, signInWithCredential } from 'firebase/auth'
 import type { User } from 'firebase/auth'
