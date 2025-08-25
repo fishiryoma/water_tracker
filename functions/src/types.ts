@@ -4,6 +4,7 @@ export interface UserData {
   displayName?: string
   pictureUrl?: string
   statusMessage?: string
+  language?: string
   joinedAt: string
   lastActiveAt: string
   isActive: boolean

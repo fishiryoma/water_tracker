@@ -1,4 +1,15 @@
 import { Message } from '@line/bot-sdk'
+import { zh } from './locales/zh'
+import { ja } from './locales/ja'
+
+const messages = { zh, ja }
+type SupportedLang = keyof typeof messages
+
+// 根據語言代碼取得對應的文字庫，預設為中文
+function getLocale(lang?: string) {
+  const languageCode = lang?.split('-')[0] as SupportedLang // 'zh-TW' -> 'zh'
+  return messages[languageCode] || messages.zh
+}
 
 /**
  * 生成歡迎訊息
@@ -6,37 +17,40 @@ import { Message } from '@line/bot-sdk'
 export function createWelcomeMessage(displayName?: string): Message {
   return {
     type: 'text',
-    text: `🎉 歡迎加入！${displayName || '朋友'}\n\n多喝水沒事沒事多喝水\n\n 趕快連結您的 LINE 帳戶！\n\nhttps://water-record.web.app/`,
+    text: zh.welcome(displayName),
   }
 }
 
 /**
  * 生成登入指引訊息
  */
-export function createLoginMessage(): Message {
+export function createLoginMessage(lang?: string): Message {
+  const t = getLocale(lang)
   return {
     type: 'text',
-    text: `🔐 LINE 登入\n\n請點擊以下連結來連結您的 LINE 帳戶：\nhttps://water-record.web.app/`,
+    text: t.login,
   }
 }
 
 /**
  * 生成一般回覆訊息
  */
-export function createGeneralReply(totalDrank: number): Message {
+export function createGeneralReply(totalDrank: number, lang?: string): Message {
+  const t = getLocale(lang)
   return {
     type: 'text',
-    text: `🔺今日已喝${totalDrank}mL🤩💓🥛繼續加油唷😘\n\n💡 輸入「登入」可以連結視覺化網站跟 LINE 帳戶！\n🧑‍💻 輸入一個數字就可以自動幫你紀錄喝水量唷！`,
+    text: t.generalReply(totalDrank),
   }
 }
 
 /**
  * 回覆喝水總量
  */
-export function replayTotalDrink(totalDrank: number): Message {
+export function replayTotalDrink(totalDrank: number, lang?: string): Message {
+  const t = getLocale(lang)
   return {
     type: 'text',
-    text: `🔺今日已喝${totalDrank}mL🤩💓`,
+    text: t.replayTotalDrink(totalDrank),
   }
 }
 
@@ -44,9 +58,19 @@ export function replayTotalDrink(totalDrank: number): Message {
  * 檢查是否為登入相關訊息
  */
 export function isLoginMessage(message: string): boolean {
-  return (
-    message.includes('登入') ||
-    message.toLowerCase().includes('login') ||
-    message.includes('ログイン')
-  )
+  // 檢查所有語言的關鍵字，讓用戶用任何一種語言都能觸發
+  const allKeywords = [...zh.loginKeywords, ...ja.loginKeywords]
+  const uniqueKeywords = new Set(allKeywords.map((k) => k.toLowerCase()))
+  return uniqueKeywords.has(message.toLowerCase().trim())
+}
+
+/**
+ * 生成語言切換確認訊息
+ */
+export function createLangSwitchMessage(lang: string): Message {
+  const t = getLocale(lang)
+  return {
+    type: 'text',
+    text: t.langSwitched,
+  }
 }

@@ -1,11 +1,20 @@
 import { UserData } from './types'
-import { getUserProfile, saveUser, updateUserActivity, replyMessage, getDrinkData } from './utils'
+import {
+  getUserProfile,
+  saveUser,
+  updateUserActivity,
+  replyMessage,
+  getDrinkData,
+  getUser,
+  updateUserLanguage,
+} from './utils'
 import {
   createWelcomeMessage,
   createLoginMessage,
   createGeneralReply,
   replayTotalDrink,
   isLoginMessage,
+  createLangSwitchMessage,
 } from './messages'
 
 /**
@@ -25,6 +34,7 @@ export async function handleFollowEvent(event: any, accessToken: string, secret:
       displayName: profile?.displayName || '未設定',
       pictureUrl: profile?.pictureUrl || '未設定',
       statusMessage: profile?.statusMessage || '未設定',
+      language: profile?.language, // 保存用戶語言
       joinedAt: new Date().toISOString(),
       lastActiveAt: new Date().toISOString(),
       isActive: true,
@@ -69,19 +79,35 @@ export async function handleUnfollowEvent(event: any) {
  */
 export async function handleTextMessage(event: any, accessToken: string, secret: string) {
   const userId = event.source.userId
-  const userMessage = event.message.text
+  const userMessage = event.message.text.toUpperCase().trim()
   console.log(`✅ 收到來自 ${userId} 的訊息: "${userMessage}"`)
 
-  const isNumber = Number(userMessage.trim())
-  const drinkAmount = isNumber && isNumber > 0 ? isNumber : NaN
   try {
-    const drinkData = await getDrinkData(userId)
+    // 語言切換邏輯
+    if (userMessage === 'TW' || userMessage === 'JP') {
+      const lang = userMessage === 'TW' ? 'zh-TW' : 'ja'
+      const result = await updateUserLanguage(userId, lang)
+      if (result) {
+        const replyMsg = createLangSwitchMessage(lang)
+        await replyMessage(event.replyToken, replyMsg, accessToken, secret)
+        console.log(`✅ 已為用戶 ${userId} 切換語言為 ${lang}`)
+        return { success: true, userId, message: 'language_switched' }
+      }
+    }
+
+    // 獲取用戶和飲水數據
+    const userData = await getUser(userId)
+    const userLang = userData?.language
+    const drinkData = await getDrinkData(userId, userLang)
+
+    const isNumber = Number(userMessage.trim())
+    const drinkAmount = isNumber && isNumber > 0 ? isNumber : NaN
     const drinkUpdate =
       !isNaN(drinkAmount) && drinkAmount < drinkData.waterTarget - drinkData.totalDrank
 
     // 更新用戶活動時間
     if (drinkUpdate) {
-      await updateUserActivity(userId, true, drinkAmount, drinkData.totalDrank)
+      await updateUserActivity(userId, true, drinkAmount, drinkData.totalDrank, userLang)
     } else {
       await updateUserActivity(userId, true)
     }
@@ -89,11 +115,11 @@ export async function handleTextMessage(event: any, accessToken: string, secret:
     // 準備回覆訊息
     let replyMsg
     if (isLoginMessage(userMessage)) {
-      replyMsg = createLoginMessage()
+      replyMsg = createLoginMessage(userLang)
     } else if (drinkUpdate) {
-      replyMsg = replayTotalDrink(drinkData.totalDrank + drinkAmount)
+      replyMsg = replayTotalDrink(drinkData.totalDrank + drinkAmount, userLang)
     } else {
-      replyMsg = createGeneralReply(drinkData.totalDrank)
+      replyMsg = createGeneralReply(drinkData.totalDrank, userLang)
     }
 
     if (event.replyToken) {

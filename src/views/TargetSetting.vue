@@ -5,10 +5,11 @@
     <div class="w-full my-4">
       <FourDigitInput v-model="targetAmount" />
     </div>
-    <div class="flex gap-3">
+    <!-- <div class="flex gap-3"> -->
       <Button @click="saveTarget" outerClass="sm:w-40 w-24">{{ $t('BUTTON.CHANGE') }}</Button>
-      <Button @click="resetTarget">{{ $t('BUTTON.RESET') }}</Button>
-    </div>
+      <!-- <Button @click="resetTarget">{{ $t('BUTTON.RESET') }}</Button> -->
+    <!-- </div> -->
+    <LoadingSpinner :show="updateLoading" />
     <p v-if="successMessage" class="mt-4 text-sm text-green-600 font-medium">
       {{ successMessage }}
     </p>
@@ -27,6 +28,8 @@ import { storeToRefs } from 'pinia'
 import { useWaterStore } from '@/stores/water'
 import { formatDateToUserTimeZone } from '@/utils'
 import { useI18n } from 'vue-i18n'
+import PageLoading from '@/components/PageLoading.vue'
+import LoadingSpinner from '@/components/LoadingSpinner.vue'
 
 const { t } = useI18n()
 
@@ -36,7 +39,8 @@ const errorStore = useGlobalErrorStore()
 const testId = `${getUserPath.value}/waterTarget`
 const targetAmount = ref<number | null>(null)
 const successMessage = ref<string>('')
-const isLoading = ref(false)
+const isLoading = ref(true)
+const updateLoading = ref(false)
 
 watchEffect(() => {
   if (currentTarget.value) {
@@ -55,13 +59,15 @@ const saveTarget = async () => {
     return
   }
 
-  isLoading.value = true
+  updateLoading.value = true
+  console.log('儲存喝水目標')
   try {
     await set(dbRef(database, testId), targetAmount.value)
     successMessage.value = t('SUCCESS.TARGET_UPDATED')
     setTimeout(() => {
       successMessage.value = ''
     }, 3000)
+    console.log('test')
   } catch (error) {
     console.error('儲存喝水目標失敗:', error)
     errorStore.handleFirebaseError(error, t('ERROR.SAVE_TARGET'))
@@ -86,13 +92,13 @@ const saveTarget = async () => {
     console.error('更新今日喝水紀錄失敗:', e)
     errorStore.handleFirebaseError(e, t('ERROR.UPDATE_TODAY_RECORD'))
   } finally {
-    isLoading.value = false
+    updateLoading.value = false
   }
 }
 
-const resetTarget = () => {
-  targetAmount.value = currentTarget.value
-}
+// const resetTarget = () => {
+//   targetAmount.value = currentTarget.value
+// }
 </script>
 
 <style scoped></style>

@@ -15,6 +15,13 @@ export const formatDateToUserTimeZone = (date: Date): string => {
 }
 
 /**
+ * 取得使用者時區的今天日期
+ */
+export const getTodayDateForUser = (): string => {
+  return formatDateToUserTimeZone(new Date())
+}
+
+/**
  * 取得 7 個日期字串
  */
 export const getWeekDates = (wholeWeek: boolean = false, date?: string): string[] => {
@@ -38,8 +45,9 @@ export const getWeekDates = (wholeWeek: boolean = false, date?: string): string[
  */
 export const weekStatus = (
   dates: string[],
-  todayStr: string = new Date().toISOString().slice(0, 10),
+  todayStr: string = getTodayDateForUser(),
 ): { date: string; status: string; finished: boolean | null }[] => {
+  console.log('todayStr', todayStr, new Date().toISOString().slice(0, 10))
   return dates.map((date) => ({
     date,
     status: date === todayStr ? 'today' : 'pass',
@@ -49,8 +57,7 @@ export const weekStatus = (
 
 export const generateMonthDates = (year: number, month: number): string[] => {
   const daysInMonth = new Date(year, month, 0).getDate() // month 是 1~12
-  const today = new Date()
-  const todayStr = formatDateToUserTimeZone(today)
+  const todayStr = getTodayDateForUser()
   const dates: string[] = []
 
   for (let day = 1; day <= daysInMonth; day++) {
