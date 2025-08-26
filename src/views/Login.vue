@@ -76,19 +76,19 @@ const errorStore = useGlobalErrorStore()
 const { t } = useI18n()
 
 // 初始化 LIFF
-let liffReady = false
-async function initializeLiff() {
-  try {
-    await liff.init({ liffId: '2007574485-nVKgAdK9' })
-    liffReady = true
-    console.log('LIFF 初始化成功')
-    return true // 表示可以繼續在當前環境操作
-  } catch (error) {
-    console.error('LIFF 初始化失敗', error)
-    errorStore.handleNetworkError(error, 'LIFF 初始化')
-    return false
-  }
-}
+// let liffReady = false
+// async function initializeLiff() {
+//   try {
+//     await liff.init({ liffId: '2007574485-nVKgAdK9' })
+//     liffReady = true
+//     console.log('LIFF 初始化成功')
+//     return true // 表示可以繼續在當前環境操作
+//   } catch (error) {
+//     console.error('LIFF 初始化失敗', error)
+//     errorStore.handleNetworkError(error, 'LIFF 初始化')
+//     return false
+//   }
+// }
 
 // 使用 LINE ID Token 登入 Firebase
 const loginWithLineToken = async (idToken: string) => {
@@ -120,13 +120,13 @@ const handleLineLogin = async () => {
 
   try {
     // 等待 LIFF 初始化
-    if (!liffReady) {
-      const canContinue = await initializeLiff()
-      if (!canContinue) {
-        loading.value = false
-        return
-      }
-    }
+    // if (!liffReady) {
+    //   const canContinue = await initializeLiff()
+    //   if (!canContinue) {
+    //     loading.value = false
+    //     return
+    //   }
+    // }
 
     // 檢查是否已登入
     if (liff.isLoggedIn()) {
@@ -176,12 +176,12 @@ const checkLoginStatus = async () => {
     }
 
     // 等待 LIFF 初始化
-    if (!liffReady) {
-      const canContinue = await initializeLiff()
-      if (!canContinue) {
-        return
-      }
-    }
+    // if (!liffReady) {
+    //   const canContinue = await initializeLiff()
+    //   if (!canContinue) {
+    //     return
+    //   }
+    // }
 
     // 檢查 LIFF 登入狀態
     if (liff.isLoggedIn()) {
