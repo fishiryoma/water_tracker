@@ -15,9 +15,9 @@ import { useGlobalErrorStore } from '@/stores/globalError'
 import { auth } from '@/firebase'
 import { signOut } from 'firebase/auth'
 import { useI18n } from 'vue-i18n'
-import logoJp from '@/assets/logo_Jp.png'
-import logoTw from '@/assets/logo_Tw.png'
-import logoEn from '@/assets/logo_En.png'
+import logoJp from '@/assets/logo_Jp_s.png'
+import logoTw from '@/assets/logo_Tw_s.png'
+import logoEn from '@/assets/logo_En_s.png'
 
 const { t, locale } = useI18n()
 
@@ -111,8 +111,8 @@ watch(
       <RouterView />
     </Container>
     <!-- 測試用 -->
-    <MenuBtn :handleLogout="handleLogout" />
-    <!-- <MenuBtn :handleLogout="handleLogout" v-if="userId.length > 0"/> -->
+    <!-- <MenuBtn :handleLogout="handleLogout" /> -->
+    <MenuBtn :handleLogout="handleLogout" v-if="userId.length > 0"/>
   </BackgroundContainer>
 
   <!-- 全局錯誤處理器 -->

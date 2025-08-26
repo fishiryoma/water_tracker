@@ -25,18 +25,16 @@ export const getTodayDateForUser = (): string => {
  * 取得 7 個日期字串
  */
 export const getWeekDates = (wholeWeek: boolean = false, date?: string): string[] => {
-  const today = date ? new Date(date) : new Date()
-  const dayOfWeek = today.getDay() // 0 = Sunday
-  const sunday = new Date(today)
-  sunday.setDate(today.getDate() - dayOfWeek)
+  const today = date ? dayjs(date) : dayjs()
+  const dayWithTimeZone = today.tz(dayjs.tz.guess())
+  const dayOfWeek = dayWithTimeZone.day() // 0 = Sunday
+  const sunday = dayWithTimeZone.startOf('week')
 
   const dates: string[] = []
   for (let i = 0; i < (wholeWeek ? 6 : dayOfWeek) + 1; i++) {
-    const d = new Date(sunday)
-    d.setDate(sunday.getDate() + i)
-    dates.push(d.toISOString().slice(0, 10))
+    const d = sunday.add(i, 'day')
+    dates.push(d.format('YYYY-MM-DD'))
   }
-
   return dates
 }
 
@@ -47,7 +45,7 @@ export const weekStatus = (
   dates: string[],
   todayStr: string = getTodayDateForUser(),
 ): { date: string; status: string; finished: boolean | null }[] => {
-  console.log('todayStr', todayStr, new Date().toISOString().slice(0, 10))
+
   return dates.map((date) => ({
     date,
     status: date === todayStr ? 'today' : 'pass',

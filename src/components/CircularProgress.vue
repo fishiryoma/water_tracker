@@ -98,7 +98,7 @@
 </template>
 
 <script setup lang="ts">
-import { watch, nextTick, ref, computed, onMounted, defineExpose } from 'vue'
+import { watch, nextTick, ref, computed, onMounted } from 'vue'
 import { gsap } from 'gsap'
 
 const props = defineProps({
