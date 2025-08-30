@@ -60,14 +60,12 @@ const saveTarget = async () => {
   }
 
   updateLoading.value = true
-  console.log('儲存喝水目標')
   try {
     await set(dbRef(database, testId), targetAmount.value)
     successMessage.value = t('SUCCESS.TARGET_UPDATED')
     setTimeout(() => {
       successMessage.value = ''
     }, 3000)
-    console.log('test')
   } catch (error) {
     console.error('儲存喝水目標失敗:', error)
     errorStore.handleFirebaseError(error, t('ERROR.SAVE_TARGET'))

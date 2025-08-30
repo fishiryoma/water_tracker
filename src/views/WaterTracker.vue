@@ -12,7 +12,7 @@
           </span>
         </div>
         <div v-else class="flex flex-col items-center z-1 gap-2">
-          <div class="text-2xl font-bold text-sky-800 shiny-text">{{ $t('TRACKER.SUCCESS') }}</div>
+          <div class="text-2xl font-bold text-sky-800 shiny-text">{{ progressPercentage.toFixed(0) }}%</div>
           <span class="text-sm text-sky-800 font-bold"> {{ todayDrank }} ml </span>
         </div>
       </template>
@@ -105,7 +105,7 @@ const remainingWater = computed<number>(() => {
 
 const progressPercentage = computed<number>(() => {
   if (dailyTarget.value === 0) return 0
-  return Math.min(100, (todayDrank.value / dailyTarget.value) * 100)
+  return (todayDrank.value / dailyTarget.value) * 100
 })
 
 const weekDates = computed(() => {
@@ -267,7 +267,7 @@ const animateDroplet = (droplet: HTMLElement, trajectory: Trajectory) => {
 
 // 增加喝水量
 const addWater = async (amount: number, event: Event) => {
-  if (todayDrank.value >= dailyTarget.value || amount <= 0) return
+  if (amount <= 0) return
   // 1. 先發射水珠動畫
   const targetEl = circularProgressRef.value?.rootEl
   const buttonEl = event.target as HTMLElement
@@ -283,8 +283,8 @@ const addWater = async (amount: number, event: Event) => {
     try {
       await update(dbRef(database, recordPath), {
         finished: isFinished,
-        totalDrank: isFinished ? dailyTarget.value : newTotalDrank,
-        [`logs/${Date.now()}`]: isFinished ? dailyTarget.value - todayDrank.value : amount,
+        totalDrank: newTotalDrank,
+        [`logs/${Date.now()}`]: amount,
       })
     } catch (error) {
       console.error('增加喝水紀錄失敗:', error)
