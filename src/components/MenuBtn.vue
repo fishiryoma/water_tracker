@@ -20,7 +20,7 @@
         </div>
       </RouterLink>
     </div>
-    <div>
+    <!-- <div>
       <div
         @click="props.handleLogout"
         class="flex flex-col items-center justify-center rounded-r-lg bg-primary-300/70 text-gray-800 px-4 sm:px-6 py-1 sm:py-2 hover:opacity-80 cursor-pointer duration-200"
@@ -28,7 +28,7 @@
         <ArrowTopRightOnSquareIcon class="sm:w-8 w-6" />
         <p class="text-xs sm:text-sm">{{ $t('MENU.LOGOUT') }}</p>
       </div>
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -44,12 +44,12 @@ import { useI18n } from 'vue-i18n'
 const { t } = useI18n()
 
 
-const props = defineProps({
-  handleLogout: {
-    type: Function as PropType<() => Promise<void>>,
-    required: true,
-  },
-})
+// const props = defineProps({
+//   handleLogout: {
+//     type: Function as PropType<() => Promise<void>>,
+//     required: true,
+//   },
+// })
 
 const menu = computed(() => [
   { url: '/target', icon: ChartBarSquareIcon, text: t('MENU.TARGET') },

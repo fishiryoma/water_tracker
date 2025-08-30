@@ -1,24 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import TargetSetting from '@/views/TargetSetting.vue'
 import Login from '@/views/Login.vue'
-import { auth } from '@/firebase'
-import { updateUserData } from '@/hooks/useUpdateUser'
-import type { User } from 'firebase/auth'
-import { onAuthStateChanged } from 'firebase/auth'
-
-
-const getCurrentUser = () => {
-  return new Promise((resolve, reject) => {
-    const removeListener = onAuthStateChanged(
-      auth,
-      (user) => {
-        removeListener()
-        resolve(user)
-      },
-      reject,
-    )
-  })
-}
+import { useUserIdStore } from '@/stores/userId'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -56,21 +39,17 @@ const router = createRouter({
   ],
 })
 
-router.beforeEach(async (to, _from, next) => {
+router.beforeEach((to, _from, next) => {
   const requiresAuth = to.matched.some((route) => route.meta.requiresAuth)
-  const currentUser = await getCurrentUser()
-  if (requiresAuth) {
-    // if (currentUser) {
-    //   await updateUserData(currentUser as User)
-    next()
-    // } else {
-    //   next({ name: 'login' })
-    // }
-  } else if (to.name === 'login' && currentUser) {
+  const { userId } = useUserIdStore()
+  if (requiresAuth && !userId) {
+    // 如果路由需要驗證，但使用者未登入，則導向登入頁
+    next({ name: 'login' })
+  } else if (to.name === 'login' && userId) {
+    // 如果使用者已登入，但要前往登入頁，則導向主頁
     next({ name: 'tracker' })
   } else {
-    // 如果路由不需要驗證，則直接允許導航
-    console.log('不需要驗證的路由，允許導航')
+    // 其他情況（不需驗證的路由，或需驗證且已登入的路由）皆允許導航
     next()
   }
 })

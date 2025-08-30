@@ -17,12 +17,12 @@
     </div>
     <!-- v-if="isInLineApp() && !loading" -->
     <!-- 在 LINE 內建瀏覽器的特殊提示 -->
-    <div  class="text-primary-700 sm:p-4 p-2 rounded-lg mb-4">
+    <div v-if="isInLineApp() && !loading" class="text-primary-700 sm:p-4 p-2 rounded-lg mb-4">
       <div class="flex items-start">
         <div class="mr-3">📱</div>
         <div>
           <strong class="block mb-2">{{ t('LOGIN.LINE_NOTICE_TITLE') }}</strong>
-          <ol class="text-sm space-y-1 list-decimal ">
+          <ol class="text-sm space-y-1 list-decimal">
             <li>{{ t('LOGIN.LINE_NOTICE_STEP1') }}</li>
             <li>{{ t('LOGIN.LINE_NOTICE_STEP2') }}</li>
             <li>{{ t('LOGIN.LINE_NOTICE_STEP3') }}</li>
@@ -75,21 +75,6 @@ const router = useRouter()
 const errorStore = useGlobalErrorStore()
 const { t } = useI18n()
 
-// 初始化 LIFF
-// let liffReady = false
-// async function initializeLiff() {
-//   try {
-//     await liff.init({ liffId: '2007574485-nVKgAdK9' })
-//     liffReady = true
-//     console.log('LIFF 初始化成功')
-//     return true // 表示可以繼續在當前環境操作
-//   } catch (error) {
-//     console.error('LIFF 初始化失敗', error)
-//     errorStore.handleNetworkError(error, 'LIFF 初始化')
-//     return false
-//   }
-// }
-
 // 使用 LINE ID Token 登入 Firebase
 const loginWithLineToken = async (idToken: string) => {
   try {
@@ -119,15 +104,6 @@ const handleLineLogin = async () => {
   loading.value = true
 
   try {
-    // 等待 LIFF 初始化
-    // if (!liffReady) {
-    //   const canContinue = await initializeLiff()
-    //   if (!canContinue) {
-    //     loading.value = false
-    //     return
-    //   }
-    // }
-
     // 檢查是否已登入
     if (liff.isLoggedIn()) {
       const idToken = liff.getIDToken()
@@ -174,14 +150,6 @@ const checkLoginStatus = async () => {
       }
       return
     }
-
-    // 等待 LIFF 初始化
-    // if (!liffReady) {
-    //   const canContinue = await initializeLiff()
-    //   if (!canContinue) {
-    //     return
-    //   }
-    // }
 
     // 檢查 LIFF 登入狀態
     if (liff.isLoggedIn()) {

@@ -68,11 +68,16 @@
     "LOGOUT_FAILED_DETAILS": "もう一度ログアウトをお試しください",
     "UPDATE_USER_DATA": "ユーザーデータを更新",
     "WEEKLY_LISTENER": "週間データを監視",
-    "LIFF_INIT": "LIFF初期化",
     "FIREBASE_LOGIN": "Firebaseログイン",
     "USER_LOGIN": "ユーザーログイン",
     "AUTO_LOGIN": "自動ログイン",
-    "TARGET_SAME": "目標が変更されていません"
+    "TARGET_SAME": "目標が変更されていません",
+    "AUTH_STATE_FAILED_TITLE": "ユーザー状態の確認に失敗しました",
+    "AUTH_STATE_FAILED_DETAILS": "ログイン状態を確認できませんでした。ネットワーク接続を確認して、ページを再読み込みしてください。",
+    "LIFF_INIT_FAILED_TITLE": "アプリの起動に失敗しました",
+    "LIFF_INIT_FAILED_DETAILS": "LIFFの初期化エラー。ネットワークまたはLIFF IDを確認してください。",
+    "LIFF_INIT_ERROR_MESSAGE": "エラーメッセージ",
+    "LIFF_INIT_FAILED_SUGGESTION": "リフレッシュするか、管理者に連絡してください"
   },
   "WEEKDAYS_SHORT": [
     "日",

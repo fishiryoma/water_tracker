@@ -68,11 +68,16 @@
     "LOGOUT_FAILED_DETAILS": "請重新嘗試登出操作",
     "UPDATE_USER_DATA": "更新用戶資料",
     "WEEKLY_LISTENER": "監聽 weekly 資料",
-    "LIFF_INIT": "LIFF 初始化",
     "FIREBASE_LOGIN": "Firebase 登入",
     "USER_LOGIN": "用戶登入",
     "AUTO_LOGIN": "自動登入",
-    "TARGET_SAME": "目標未改變"
+    "TARGET_SAME": "目標未改變",
+    "AUTH_STATE_FAILED_TITLE": "驗證使用者狀態失敗",
+    "AUTH_STATE_FAILED_DETAILS": "無法確認您的登入狀態，請檢查您的網路連線並重新整理頁面。",
+    "LIFF_INIT_FAILED_TITLE": "應用程式啟動失敗",
+    "LIFF_INIT_FAILED_DETAILS": "LIFF 初始化錯誤，請檢查您的網路或 LIFF ID。",
+    "LIFF_INIT_ERROR_MESSAGE": "錯誤訊息",
+    "LIFF_INIT_FAILED_SUGGESTION": "請重新整理或聯絡管理者"
   },
   "WEEKDAYS_SHORT": ["日", "一", "二", "三", "四", "五", "六"],
   "CHART": {

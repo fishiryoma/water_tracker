@@ -68,11 +68,16 @@
     "LOGOUT_FAILED_DETAILS": "Please try logging out again",
     "UPDATE_USER_DATA": "Update user data",
     "WEEKLY_LISTENER": "Listen to weekly data",
-    "LIFF_INIT": "LIFF Initialization",
     "FIREBASE_LOGIN": "Firebase Login",
     "USER_LOGIN": "User Login",
     "AUTO_LOGIN": "Auto Login",
-    "TARGET_SAME": "Target has not changed"
+    "TARGET_SAME": "Target has not changed",
+    "AUTH_STATE_FAILED_TITLE": "Failed to Verify User Status",
+    "AUTH_STATE_FAILED_DETAILS": "Could not confirm your login status. Please check your network connection and refresh the page.",
+    "LIFF_INIT_FAILED_TITLE": "Application Failed to Start",
+    "LIFF_INIT_FAILED_DETAILS": "LIFF initialization error. Please check your network or LIFF ID.",
+    "LIFF_INIT_ERROR_MESSAGE": "Error Message",
+    "LIFF_INIT_FAILED_SUGGESTION": "Please refresh or contact an administrator"
   },
   "WEEKDAYS_SHORT": [
     "Sun",
