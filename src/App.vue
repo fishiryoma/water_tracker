@@ -89,7 +89,7 @@ watch(
       <RouterView />
     </Container>
     <!-- 測試用 -->
-    <!-- <MenuBtn :handleLogout="handleLogout" /> -->
+    <!-- <MenuBtn /> -->
     <MenuBtn v-if="userId.length > 0" />
   </BackgroundContainer>
 

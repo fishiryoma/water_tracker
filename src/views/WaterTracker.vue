@@ -12,7 +12,9 @@
           </span>
         </div>
         <div v-else class="flex flex-col items-center z-1 gap-2">
-          <div class="text-2xl font-bold text-sky-800 shiny-text">{{ progressPercentage.toFixed(0) }}%</div>
+          <div class="text-2xl font-bold text-sky-800 shiny-text">
+            {{ progressPercentage.toFixed(0) }}%
+          </div>
           <span class="text-sm text-sky-800 font-bold"> {{ todayDrank }} ml </span>
         </div>
       </template>
@@ -29,7 +31,15 @@
       </Button>
     </div>
 
-    <div class="flex gap-4 items-center justify-center w-full">
+    <div class="flex gap-2 items-center justify-center w-full">
+      <select
+        v-model="selectedHour"
+        class="sm:h-13 h-10 sm:px-4 px-2 text-base sm:text-lg text-gray-700 bg-white border-2 border-gray-200 rounded-lg focus:outline-none focus:border-primary-300 transition-colors flex"
+      >
+        <option v-for="hour in 24" :key="hour - 1" :value="hour - 1">
+          {{ (hour - 1).toString().padStart(2, '0') + ' ' + $t('STATISTICS.HOUR') }}
+        </option>
+      </select>
       <FormInput
         type="number"
         step="100"
@@ -41,7 +51,7 @@
         inputmode="numeric"
         pattern="[0-9]*"
       />
-      <Button ref="cusButton" @click="(addWater(inputDrank, $event), (inputDrank = 0))">
+      <Button ref="cusButton" @click="addCustomWater">
         {{ $t('BUTTON.SEND') }}
       </Button>
     </div>
@@ -90,6 +100,7 @@ const { weeklyDrank } = storeToRefs(useWeeklyStore())
 // 響應式數據
 const todayDrank = ref<number>(0) // 今日已喝水量
 const inputDrank = ref<number>(0) // input輸入喝水量
+const selectedHour = ref(new Date().getHours())
 const todayDate = ref<string>('') // 今日日期，格式為 YYYY-MM-DD
 const unsubs: Array<() => void> = [] // Firebase 監聽取消函式收集
 const circularProgressRef = ref<InstanceType<typeof CircularProgress> | null>(null)
@@ -265,6 +276,11 @@ const animateDroplet = (droplet: HTMLElement, trajectory: Trajectory) => {
     .to(droplet, { scale: 0.3, opacity: 0.7, duration: 0.3 }, '<0.5')
 }
 
+const addCustomWater = (event: Event) => {
+  addWater(inputDrank.value, event)
+  inputDrank.value = 0
+}
+
 // 增加喝水量
 const addWater = async (amount: number, event: Event) => {
   if (amount <= 0) return
@@ -279,12 +295,16 @@ const addWater = async (amount: number, event: Event) => {
     const newTotalDrank = todayDrank.value + amount
     const recordPath = `${getUserPath.value}/dailyRecords/${todayDate.value}`
 
+    const logTime = new Date()
+    logTime.setHours(selectedHour.value)
+    const timestamp = logTime.getTime()
+
     const isFinished = newTotalDrank >= dailyTarget.value
     try {
       await update(dbRef(database, recordPath), {
         finished: isFinished,
         totalDrank: newTotalDrank,
-        [`logs/${Date.now()}`]: amount,
+        [`logs/${timestamp}`]: amount,
       })
     } catch (error) {
       console.error('增加喝水紀錄失敗:', error)

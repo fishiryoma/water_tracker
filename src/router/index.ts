@@ -42,6 +42,8 @@ const router = createRouter({
 router.beforeEach((to, _from, next) => {
   const requiresAuth = to.matched.some((route) => route.meta.requiresAuth)
   const { userId } = useUserIdStore()
+  // 測試用
+  // next()
   if (requiresAuth && !userId) {
     // 如果路由需要驗證，但使用者未登入，則導向登入頁
     next({ name: 'login' })
