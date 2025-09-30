@@ -3,6 +3,7 @@
     "TARGET": "目標を変更",
     "TRACKER": "今日の飲水量",
     "CALENDAR": "達成カレンダー",
+    "SETTING": "設定",
     "LOGOUT": "ログアウト"
   },
   "TITLE": {
@@ -15,7 +16,8 @@
     "CHANGE": "目標を変更",
     "RESET": "リセット",
     "CLEAR_ALL": "すべての通知を消去",
-    "LINK_LINE": "🔗 LINEアカウントを連携"
+    "LINK_LINE": "🔗 LINEアカウントを連携",
+    "SAVE": "保存"
   },
   "TRACKER": {
     "SUBTITLE": "今週の目標達成表",
@@ -53,7 +55,8 @@
     "WATER_INTAKE": "例: 250"
   },
   "SUCCESS": {
-    "TARGET_UPDATED": "✅目標が更新されました"
+    "TARGET_UPDATED": "✅目標が更新されました",
+    "SETTINGS_SAVED": "✅設定が保存されました"
   },
   "ERROR": {
     "MONTH": "月間データの読み込み",
@@ -79,17 +82,16 @@
     "LIFF_INIT_ERROR_MESSAGE": "エラーメッセージ",
     "LIFF_INIT_FAILED_SUGGESTION": "リフレッシュするか、管理者に連絡してください"
   },
-  "WEEKDAYS_SHORT": [
-    "日",
-    "月",
-    "火",
-    "水",
-    "木",
-    "金",
-    "土"
-  ],
+  "WEEKDAYS_SHORT": ["日", "月", "火", "水", "木", "金", "土"],
   "CHART": {
     "BUBBLE_LABEL": "1回の飲水量",
     "BAR_LABEL": "1日の総量"
+  },
+  "SETTING": {
+    "THEME": "テーマ",
+    "THEME_SAKURA": "桜",
+    "THEME_RAIN": "雨",
+    "DEFAULT_BUTTONS": "デフォルトの飲水量ボタン",
+    "BUTTON": "ボタン"
   }
 }
