@@ -3,6 +3,7 @@
     "TARGET": "Goal",
     "TRACKER": "Tracker",
     "CALENDAR": "Calendar",
+    "SETTING": "Setting",
     "LOGOUT": "Log Out"
   },
   "TITLE": {
@@ -15,7 +16,8 @@
     "CHANGE": "Change Goal",
     "RESET": "Reset",
     "CLEAR_ALL": "Clear All Notifications",
-    "LINK_LINE": "🔗 Link LINE Account"
+    "LINK_LINE": "🔗 Link LINE Account",
+    "SAVE": "Save"
   },
   "TRACKER": {
     "SUBTITLE": "This Week’s Goal Achievement Chart",
@@ -53,7 +55,8 @@
     "WATER_INTAKE": "e.g., 250"
   },
   "SUCCESS": {
-    "TARGET_UPDATED": "✅ Goal Updated Successfully"
+    "TARGET_UPDATED": "✅ Goal Updated Successfully",
+    "SETTINGS_SAVED": "✅ Settings saved successfully!"
   },
   "ERROR": {
     "MONTH": "Load monthly data",
@@ -79,17 +82,16 @@
     "LIFF_INIT_ERROR_MESSAGE": "Error Message",
     "LIFF_INIT_FAILED_SUGGESTION": "Please refresh or contact an administrator"
   },
-  "WEEKDAYS_SHORT": [
-    "Sun",
-    "Mon",
-    "Tue",
-    "Wed",
-    "Thu",
-    "Fri",
-    "Sat"
-  ],
+  "WEEKDAYS_SHORT": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
   "CHART": {
     "BUBBLE_LABEL": "Single Intake",
     "BAR_LABEL": "Daily Total"
+  },
+  "SETTING": {
+    "THEME": "Theme",
+    "THEME_SAKURA": "Sakura",
+    "THEME_RAIN": "Rainy",
+    "DEFAULT_BUTTONS": "Default Intake Buttons",
+    "BUTTON": "Button"
   }
 }

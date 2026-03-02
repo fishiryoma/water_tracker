@@ -3,6 +3,7 @@
     "TARGET": "更改目標",
     "TRACKER": "今日飲水量",
     "CALENDAR": "完成月曆",
+    "SETTING": "設定",
     "LOGOUT": "登出"
   },
   "TITLE": {
@@ -15,7 +16,8 @@
     "CHANGE": "更改目標",
     "RESET": "重置",
     "CLEAR_ALL": "清除所有通知",
-    "LINK_LINE": "🔗 連結 LINE 帳戶"
+    "LINK_LINE": "🔗 連結 LINE 帳戶",
+    "SAVE": "儲存"
   },
   "TRACKER": {
     "SUBTITLE": "本週喝水達標表",
@@ -53,7 +55,8 @@
     "WATER_INTAKE": "例如: 250"
   },
   "SUCCESS": {
-    "TARGET_UPDATED": "✅目標更新成功"
+    "TARGET_UPDATED": "✅目標更新成功",
+    "SETTINGS_SAVED": "✅儲存成功"
   },
   "ERROR": {
     "MONTH": "讀取月份資料",
@@ -83,5 +86,12 @@
   "CHART": {
     "BUBBLE_LABEL": "單次飲水",
     "BAR_LABEL": "每日總量"
+  },
+  "SETTING": {
+    "THEME": "主題",
+    "THEME_SAKURA": "櫻花",
+    "THEME_RAIN": "雨天",
+    "DEFAULT_BUTTONS": "預設喝水量按鈕",
+    "BUTTON": "按鈕"
   }
 }

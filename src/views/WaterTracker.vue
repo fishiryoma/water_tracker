@@ -106,9 +106,12 @@ const unsubs: Array<() => void> = [] // Firebase 監聽取消函式收集
 const circularProgressRef = ref<InstanceType<typeof CircularProgress> | null>(null)
 const isTargetLoading = ref(true)
 const isDrankLoading = ref(true)
+const isOptionsLoading = ref(true)
 
 // 計算屬性
-const isLoading = computed(() => isTargetLoading.value || isDrankLoading.value)
+const isLoading = computed(
+  () => isTargetLoading.value || isDrankLoading.value || isOptionsLoading.value,
+)
 
 const remainingWater = computed<number>(() => {
   return Math.max(0, dailyTarget.value - todayDrank.value)
@@ -131,7 +134,7 @@ const weekDates = computed(() => {
 })
 
 // --- UI ----
-const waterOptions = [350, 500, 750]
+const waterOptions = ref([350, 500, 750])
 
 // --- Firebase 數據操作 ---
 
@@ -142,6 +145,24 @@ const getTodayDate = (): string => {
 
 onMounted(() => {
   todayDate.value = getTodayDate()
+
+  // 0. 監聽預設喝水量按鈕
+  const waterOptionsRef = dbRef(database, `${getUserPath.value}/defaultWaterIntakeButton`)
+  unsubs.push(
+    onValue(
+      waterOptionsRef,
+      (snapshot) => {
+        if (snapshot.exists()) {
+          waterOptions.value = snapshot.val()
+        }
+        isOptionsLoading.value = false
+      },
+      (error) => {
+        console.error('Error loading water options:', error)
+        isOptionsLoading.value = false
+      },
+    ),
+  )
 
   // 1. 監聽每日喝水目標
   const targetRef = dbRef(database, `${getUserPath.value}/waterTarget`)

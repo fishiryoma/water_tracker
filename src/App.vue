@@ -21,8 +21,8 @@ const weatherStore = useWeatherStore()
 
 // 在應用程式初始化時獲取天氣資料
 // 先嘗試載入緩存的天氣資料，如果沒有則獲取新資料
-weatherStore.loadCachedWeather()
-weatherStore.fetchWeather()
+// weatherStore.loadCachedWeather()
+// weatherStore.fetchWeather()
 
 const logoSrc = computed(() => {
   if (locale.value === 'ja') return logoJp
@@ -31,18 +31,18 @@ const logoSrc = computed(() => {
 })
 
 // 定時檢查天氣資料是否需要更新
-const timer = setInterval(
-  () => {
-    if (!weatherStore.isFresh) {
-      weatherStore.fetchWeather()
-    }
-  },
-  60 * 60 * 1000, // 每小時檢查一次
-)
+// const timer = setInterval(
+//   () => {
+//     if (!weatherStore.isFresh) {
+//       weatherStore.fetchWeather()
+//     }
+//   },
+//   60 * 60 * 1000, // 每小時檢查一次
+// )
 
-onUnmounted(() => {
-  clearInterval(timer)
-})
+// onUnmounted(() => {
+//   clearInterval(timer)
+// })
 
 const lang = [
   { key: 'zh-TW', value: '中文' },
